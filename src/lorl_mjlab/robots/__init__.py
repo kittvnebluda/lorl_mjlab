@@ -1,0 +1,2 @@
+from lorl_mjlab.robots.unitree_aliengo.aliengo_constants import ALIENGO_ACTION_SCALE as ALIENGO_ACTION_SCALE
+from lorl_mjlab.robots.unitree_aliengo.aliengo_constants import get_aliengo_robot_cfg as get_aliengo_robot_cfg

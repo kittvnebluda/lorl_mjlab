@@ -1,0 +1,69 @@
+[project]
+name = "lorl-mjlab"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [{ name = "litt", email = "kittnablude@gmail.com" }]
+requires-python = ">=3.12"
+dependencies = ["mjlab>=1.4.0"]
+
+[project.entry-points."mjlab.tasks"]
+lorl_mjlab = "lorl_mjlab.tasks"
+
+[build-system]
+requires = ["uv_build>=0.11.21,<0.12.0"]
+build-backend = "uv_build"
+
+[project.optional-dependencies]
+cu130 = ["torch>=2.7.0"]
+cpu = ["torch>=2.7.0"]
+
+[tool.pyright]
+venvPath = "."
+venv = ".venv"
+ignore = ["./typings"]
+stubPath = "typings"
+
+[tool.ruff]
+src = ["src"]
+exclude = [".agents/"]
+line-length = 120
+
+[tool.ty.environment]
+extra-paths = ["typings"]
+
+[tool.ty.src]
+include = ["src"]
+exclude = ["typings"]
+
+[tool.uv]
+conflicts = [[{ extra = "cu130" }, { extra = "cpu" }]]
+required-environments = [
+    "sys_platform == 'darwin' and platform_machine == 'arm64'",
+    "sys_platform == 'linux' and platform_machine == 'x86_64'",
+]
+
+[[tool.uv.index]]
+name = "pytorch-cu130"
+url = "https://download.pytorch.org/whl/cu130"
+explicit = true
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[tool.uv.sources]
+torch = [
+    { index = "pytorch-cu130", extra = "cu130", marker = "sys_platform != 'darwin'" },
+    { index = "pytorch-cpu", extra = "cpu", marker = "sys_platform != 'darwin'" },
+]
+
+[dependency-groups]
+dev = [
+    "pybind11-stubgen>=2.5.5",
+    "pyright>=1.1.411",
+    "pytest>=9.1.1",
+    "ruff>=0.15.20",
+    "ty>=0.0.56",
+]

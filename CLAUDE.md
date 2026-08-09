@@ -1,0 +1,43 @@
+# CLAUDE.md
+
+## Development Workflow
+
+**Always use `uv run`, not python**.
+
+```sh
+
+# 1. Make changes.
+
+# 2. Type check.
+uv run ty check  # Fast
+uv run pyright  # More thorough, but slower
+
+# 3. Run tests.
+uv run pytest tests/  # Single suite
+uv run pytest tests/<test_file>.py  # Specific file
+
+# 4. Format and lint before committing.
+uv run ruff format
+uv run ruff check --fix
+```
+
+Common commands are bundled into a Makefile for convenience.
+
+```sh
+make format     # Format and lint
+make type       # Type-check
+make check      # make format && make type
+make test       # Run the full test suite
+```
+
+Always run `make check` before committing. This runs formatting, linting,
+and type checking. Do not commit code that fails type checking.
+
+## Commits
+
+- Line length limit is 120 columns. This applies to code, comments, and docstrings.
+- Avoid local imports unless they are strictly necessary (e.g. circular imports).
+- Tests should follow these principles:
+  - Use functions and fixtures; do not use test classes.
+  - Favor targeted, efficient tests over exhaustive edge-case coverage.
+  - Prefer running individual tests rather than the full test suite to improve iteration speed.
