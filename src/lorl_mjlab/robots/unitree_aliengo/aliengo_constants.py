@@ -1,5 +1,3 @@
-"""Unitree AlienGo constants."""
-
 from pathlib import Path
 
 import mujoco
@@ -14,7 +12,6 @@ from lorl_mjlab import LORL_SRC_PATH
 ##
 
 ALIENGO_XML: Path = LORL_SRC_PATH / "robots" / "unitree_aliengo" / "xmls" / "aliengo.xml"
-assert ALIENGO_XML.exists()
 
 
 def get_spec() -> mujoco.MjSpec:
@@ -25,10 +22,6 @@ def get_spec() -> mujoco.MjSpec:
 # Actuator config.
 ##
 
-# Flat PD gains validated in the source IsaacLab training config
-# (legged_obstacle_rl.robots.unitree.ALIENGO_CFG), applied uniformly across
-# hip/thigh/calf joints. armature is left at None to preserve the MJCF's own
-# default (0.01) rather than a fabricated per-motor reflected-inertia value.
 ALIENGO_LEG_ACTUATOR_CFG = BuiltinPositionActuatorCfg(
     target_names_expr=(".*_hip_joint", ".*_thigh_joint", ".*_calf_joint"),
     stiffness=40.0,
@@ -52,6 +45,17 @@ INIT_STATE = EntityCfg.InitialStateCfg(
     joint_vel={".*": 0.0},
 )
 
+# Folded belly-down pose
+ALIENGO_REST_JOINT_POS: dict[str, float] = {
+    ".*_hip_joint": 0.0,
+    ".*_thigh_joint": 1.5,
+    ".*_calf_joint": -2.6,
+}
+
+# Trunk height above the mean foot height that a standing robot must not sag below.
+# Set at ~0.75x the nominal standing height (INIT_STATE z is 0.5)
+ALIENGO_STAND_HEIGHT_TARGET: float = 0.36
+
 ##
 # Collision config.
 ##
@@ -71,14 +75,13 @@ FEET_ONLY_COLLISION = CollisionCfg(
 )
 
 # This enables all collisions.
-# Foot collisions are given custom condim, friction.
 FULL_COLLISION = CollisionCfg(
     geom_names_expr=(".*_collision",),
     # Harden all collision geoms.
     solref=(0.01, 1),
     # Configure feet colliders. Other colliders are frictionless (condim=1).
     condim={_foot_regex: 6, ".*_collision": 1},
-    priority={_foot_regex: 1},
+    priority={_foot_regex: 1, ".*": 0},
     friction={_foot_regex: (1, 5e-3, 5e-4)},
 )
 

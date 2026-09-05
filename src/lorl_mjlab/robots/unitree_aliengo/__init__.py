@@ -1,1 +1,0 @@
-"""Unitree AlienGo quadruped."""
