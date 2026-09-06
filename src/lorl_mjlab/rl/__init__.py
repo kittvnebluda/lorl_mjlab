@@ -13,6 +13,3 @@ from lorl_mjlab.rl.config import (
 from lorl_mjlab.rl.runner import (
     LorlDistillationRunner as LorlDistillationRunner,
 )
-from lorl_mjlab.rl.runner import (
-    LorlOnPolicyRunner as LorlOnPolicyRunner,
-)

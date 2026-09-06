@@ -1,13 +1,3 @@
-"""RSL-RL configuration extensions not yet exposed by ``mjlab.rl``.
-
-mjlab's own ``mjlab.rl.config`` only wraps PPO. The underlying ``rsl-rl-lib``
-dependency already implements DAgger distillation (``rsl_rl.algorithms.Distillation``
-/ ``rsl_rl.runners.DistillationRunner``) and PPO symmetry data-augmentation
-(``rsl_rl.extensions.Symmetry``) generically -- these dataclasses are thin,
-additive config wrappers around that existing support, mirroring
-``mjlab.rl.config``'s own dataclass shapes.
-"""
-
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from typing import Any, Literal
@@ -20,8 +10,8 @@ class RslRlSymmetryCfg:
     """Config for ``rsl_rl.extensions.Symmetry`` data augmentation / mirror loss."""
 
     data_augmentation_func: Callable[..., Any]
-    """Callable that generates mirrored observations/actions. Signature:
-  ``(env, obs, actions) -> (obs_aug, actions_aug)``."""
+    """Callable that generates mirrored observations/actions. 
+    Signature: ``(env, obs, actions) -> (obs_aug, actions_aug)``."""
     use_data_augmentation: bool = False
     """Whether to append mirrored samples to every mini-batch."""
     use_mirror_loss: bool = False
@@ -35,8 +25,8 @@ class RslRlSymmetricPpoAlgorithmCfg(RslRlPpoAlgorithmCfg):
     """``RslRlPpoAlgorithmCfg`` with symmetry-augmented data augmentation."""
 
     symmetry_cfg: RslRlSymmetryCfg | None = None
-    """Symmetry data-augmentation config. ``rsl_rl`` injects the running env into
-  it at construction time, so this only needs the augmentation function/flags."""
+    """Symmetry data-augmentation config. ``rsl_rl`` injects the running env 
+    into it at construction time, so this only needs the augmentation function/flags."""
 
 
 @dataclass
