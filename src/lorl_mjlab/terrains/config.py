@@ -1,4 +1,5 @@
 from mjlab.terrains.config import (
+    box_random_grid,
     flat,
     hf_pyramid_slope,
     hf_pyramid_slope_inv,
@@ -22,6 +23,13 @@ ROUGH_TERRAINS_CFG = TerrainGeneratorCfg(
         "hf_pyramid_slope_inv": hf_pyramid_slope_inv(proportion=0.1, slope_range=(0.0, 0.5)),
         "random_rough": random_rough(proportion=0.1),
         "wave_terrain": wave_terrain(proportion=0.1),
+        "box_random_grid": box_random_grid(
+            proportion=0.2,
+            grid_width=0.45,
+            grid_height_range=(0.05, 0.2),
+            platform_width=2.0,
+            merge_similar_heights=True,
+        ),
     },
     add_lights=True,
 )
