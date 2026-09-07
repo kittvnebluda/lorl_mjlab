@@ -1,0 +1,498 @@
+<mujoco model="icra_flat">
+    <!-- Generated from https://github.com/teamgrit-lab/ICRA2024_Quadruped_Robot_Challenges
+       at c7437c0af517b24c29db77dd373cd3371c98df43. Regenerate `uv run convert-icra-map`. -->
+    <compiler angle="radian" meshdir="." />
+    <custom>
+        <numeric name="course_extent" data="13.526 9.659 0.711" />
+        <numeric name="spawn" data="6 -4.3 3.1415927" />
+    </custom>
+    <asset>
+        <mesh name="pvc_pipe_100x1200_part00" file="pvc_pipe_100x1200_part00.obj" />
+        <mesh name="ramp_part02" file="ramp_part02.obj" />
+        <mesh name="ramp_part03" file="ramp_part03.obj" />
+        <mesh name="stepover_2_part01" file="stepover_2_part01.obj" />
+        <mesh name="stepover_2_part02" file="stepover_2_part02.obj" />
+    </asset>
+    <default>
+        <default class="icra">
+            <geom group="0" rgba="0.92 0.93 0.9 1" />
+        </default>
+    </default>
+    <worldbody>
+        <geom name="board_18x600x1032_part00__000" class="icra" type="box" size="0.009 0.3 0.516" pos="1.411 3.6025 0.3" quat="0.5 0.5 0.5 0.5" />
+        <geom name="board_18x600x1032_part00__001" class="icra" type="box" size="0.009 0.3 0.516" pos="-0.989 3.6205 0.3" quat="0.5 0.5 0.5 0.5" />
+        <geom name="board_18x600x1032_part00__002" class="icra" type="box" size="0.009 0.3 0.516" pos="1.411 -3.6025 0.3" quat="0.5 0.5 0.5 0.5" />
+        <geom name="board_18x600x1032_part00__003" class="icra" type="box" size="0.009 0.3 0.516" pos="-0.989 -3.6025 0.3" quat="0.5 0.5 0.5 0.5" />
+        <geom name="board_18x600x1200_part00__004" class="icra" type="box" size="0.009 0.3 0.6" pos="-0.464 4.2115 0.3" quat="0.7071068 0.7071068 0 0" />
+        <geom name="board_18x600x1200_part00__005" class="icra" type="box" size="0.009 0.3 0.6" pos="6.754 3.0115 0.3" quat="0.7071068 0.7071068 0 0" />
+        <geom name="board_18x600x1200_part00__006" class="icra" type="box" size="0.009 0.3 0.6" pos="4.963 3.6205 0.3" quat="0.5 0.5 0.5 0.5" />
+        <geom name="board_18x600x1200_part00__007" class="icra" type="box" size="0.009 0.3 0.6" pos="4.354 4.2115 0.3" quat="0.7071068 0.7071068 0 0" />
+        <geom name="board_18x600x1200_part00__008" class="icra" type="box" size="0.009 0.3 0.6" pos="1.936 3.0115 0.3" quat="0.7071068 0.7071068 0 0" />
+        <geom name="board_18x600x1200_part00__009" class="icra" type="box" size="0.009 0.3 0.6" pos="-6.332 4.2115 0.3" quat="0.7071068 0.7071068 0 0" />
+        <geom name="board_18x600x1200_part00__010" class="icra" type="box" size="0.009 0.3 0.6" pos="0.886 3.0115 0.3" quat="0.7071068 0.7071068 0 0" />
+        <geom name="board_18x600x1200_part00__011" class="icra" type="box" size="0.009 0.3 0.6" pos="-4.541 3.6025 0.3" quat="0.5 0.5 0.5 0.5" />
+        <geom name="board_18x600x1200_part00__012" class="icra" type="box" size="0.009 0.3 0.6" pos="-1.514 4.2115 0.3" quat="0.7071068 0.7071068 0 0" />
+        <geom name="board_18x600x1200_part00__013" class="icra" type="box" size="0.009 0.3 0.6" pos="-3.932 3.0115 0.3" quat="0.7071068 0.7071068 0 0" />
+        <geom name="board_18x600x1200_part00__014" class="icra" type="box" size="0.009 0.3 0.6" pos="-0.464 -4.2115 0.3" quat="0.7071068 0.7071068 0 0" />
+        <geom name="board_18x600x1200_part00__015" class="icra" type="box" size="0.009 0.3 0.6" pos="6.754 -3.0115 0.3" quat="0.7071068 0.7071068 0 0" />
+        <geom name="board_18x600x1200_part00__016" class="icra" type="box" size="0.009 0.3 0.6" pos="4.963 -3.6025 0.3" quat="0.5 0.5 0.5 0.5" />
+        <geom name="board_18x600x1200_part00__017" class="icra" type="box" size="0.009 0.3 0.6" pos="1.936 -3.0115 0.3" quat="0.7071068 0.7071068 0 0" />
+        <geom name="board_18x600x1200_part00__018" class="icra" type="box" size="0.009 0.3 0.6" pos="4.354 -4.2115 0.3" quat="0.7071068 0.7071068 0 0" />
+        <geom name="board_18x600x1200_part00__019" class="icra" type="box" size="0.009 0.3 0.6" pos="-6.332 -4.2115 0.3" quat="0.7071068 0.7071068 0 0" />
+        <geom name="board_18x600x1200_part00__020" class="icra" type="box" size="0.009 0.3 0.6" pos="0.886 -3.0115 0.3" quat="0.7071068 0.7071068 0 0" />
+        <geom name="board_18x600x1200_part00__021" class="icra" type="box" size="0.009 0.3 0.6" pos="-4.541 -3.6025 0.3" quat="0.5 0.5 0.5 0.5" />
+        <geom name="board_18x600x1200_part00__022" class="icra" type="box" size="0.009 0.3 0.6" pos="-1.514 -4.2115 0.3" quat="0.7071068 0.7071068 0 0" />
+        <geom name="board_18x600x1200_part00__023" class="icra" type="box" size="0.009 0.3 0.6" pos="-3.932 -3.0115 0.3" quat="0.7071068 0.7071068 0 0" />
+        <geom name="board_18x600x150_part00__024" class="icra" type="box" size="0.009 0.075 0.3" pos="6.67 3.6205 0.3" quat="0 -0.7071068 0.7071068 0" />
+        <geom name="board_18x600x150_part00__025" class="icra" type="box" size="0.009 0.075 0.3" pos="-0.38 3.6205 0.411" quat="0 -0.7071068 0.7071068 0" />
+        <geom name="board_18x600x150_part00__026" class="icra" type="box" size="0.009 0.075 0.3" pos="4.27 3.6205 0.411" quat="0 -0.7071068 0.7071068 0" />
+        <geom name="board_18x600x150_part00__027" class="icra" type="box" size="0.009 0.075 0.3" pos="2.021 3.6205 0.411" quat="0 -0.7071068 0.7071068 0" />
+        <geom name="board_18x600x150_part00__028" class="icra" type="box" size="0.009 0.075 0.3" pos="-6.247 3.6205 0.411" quat="0 -0.7071068 0.7071068 0" />
+        <geom name="board_18x600x150_part00__029" class="icra" type="box" size="0.009 0.075 0.3" pos="-1.598 3.6205 0.411" quat="0 -0.7071068 0.7071068 0" />
+        <geom name="board_18x600x150_part00__030" class="icra" type="box" size="0.009 0.075 0.3" pos="-3.847 3.6025 0.411" quat="0 -0.7071068 0.7071068 0" />
+        <geom name="board_18x600x150_part00__031" class="icra" type="box" size="0.009 0.075 0.3" pos="6.67 -3.6205 0.3" quat="0 -0.7071068 0.7071068 0" />
+        <geom name="board_18x600x150_part00__032" class="icra" type="box" size="0.009 0.075 0.3" pos="-0.38 -3.6025 0.411" quat="0 -0.7071068 0.7071068 0" />
+        <geom name="board_18x600x150_part00__033" class="icra" type="box" size="0.009 0.075 0.3" pos="2.021 -3.6025 0.411" quat="0 -0.7071068 0.7071068 0" />
+        <geom name="board_18x600x150_part00__034" class="icra" type="box" size="0.009 0.075 0.3" pos="4.288 -3.6025 0.411" quat="0 -0.7071068 0.7071068 0" />
+        <geom name="board_18x600x150_part00__035" class="icra" type="box" size="0.009 0.075 0.3" pos="-6.247 -3.6205 0.411" quat="0 -0.7071068 0.7071068 0" />
+        <geom name="board_18x600x150_part00__036" class="icra" type="box" size="0.009 0.075 0.3" pos="0.803 -3.6025 0.411" quat="0 -0.7071068 0.7071068 0" />
+        <geom name="board_18x600x150_part00__037" class="icra" type="box" size="0.009 0.075 0.3" pos="-1.58 -3.6025 0.411" quat="0 -0.7071068 0.7071068 0" />
+        <geom name="board_18x600x150_part00__038" class="icra" type="box" size="0.009 0.075 0.3" pos="-3.848 -3.6025 0.411" quat="0 -0.7071068 0.7071068 0" />
+        <geom name="board_18x600x2400_part00__039" class="icra" type="box" size="0.009 0.3 1.2" pos="5.545 2.4025 0.3" quat="0.5 -0.5 -0.5 0.5" />
+        <geom name="board_18x600x2400_part00__040" class="icra" type="box" size="0.009 0.3 1.2" pos="0.745 4.8205 0.3" quat="0.5 -0.5 -0.5 0.5" />
+        <geom name="board_18x600x2400_part00__041" class="icra" type="box" size="0.009 0.3 1.2" pos="3.145 4.8205 0.3" quat="0.5 -0.5 -0.5 0.5" />
+        <geom name="board_18x600x2400_part00__042" class="icra" type="box" size="0.009 0.3 1.2" pos="3.145 2.4025 0.3" quat="0.5 -0.5 -0.5 0.5" />
+        <geom name="board_18x600x2400_part00__043" class="icra" type="box" size="0.009 0.3 1.2" pos="-0.323 2.4025 0.3" quat="0.5 -0.5 -0.5 0.5" />
+        <geom name="board_18x600x2400_part00__044" class="icra" type="box" size="0.009 0.3 1.2" pos="-5.123 4.8205 0.3" quat="0.5 -0.5 -0.5 0.5" />
+        <geom name="board_18x600x2400_part00__045" class="icra" type="box" size="0.009 0.3 1.2" pos="-2.723 4.8205 0.3" quat="0.5 -0.5 -0.5 0.5" />
+        <geom name="board_18x600x2400_part00__046" class="icra" type="box" size="0.009 0.3 1.2" pos="-2.723 2.4025 0.3" quat="0.5 -0.5 -0.5 0.5" />
+        <geom name="board_18x600x2400_part00__047" class="icra" type="box" size="0.009 0.3 1.2" pos="5.545 -2.4025 0.3" quat="0.5 -0.5 -0.5 0.5" />
+        <geom name="board_18x600x2400_part00__048" class="icra" type="box" size="0.009 0.3 1.2" pos="0.745 -4.8205 0.3" quat="0.5 -0.5 -0.5 0.5" />
+        <geom name="board_18x600x2400_part00__049" class="icra" type="box" size="0.009 0.3 1.2" pos="3.145 -2.4025 0.3" quat="0.5 -0.5 -0.5 0.5" />
+        <geom name="board_18x600x2400_part00__050" class="icra" type="box" size="0.009 0.3 1.2" pos="3.145 -4.8205 0.3" quat="0.5 -0.5 -0.5 0.5" />
+        <geom name="board_18x600x2400_part00__051" class="icra" type="box" size="0.009 0.3 1.2" pos="-0.323 -2.4025 0.3" quat="0.5 -0.5 -0.5 0.5" />
+        <geom name="board_18x600x2400_part00__052" class="icra" type="box" size="0.009 0.3 1.2" pos="-5.123 -4.8205 0.3" quat="0.5 -0.5 -0.5 0.5" />
+        <geom name="board_18x600x2400_part00__053" class="icra" type="box" size="0.009 0.3 1.2" pos="-2.723 -4.8205 0.3" quat="0.5 -0.5 -0.5 0.5" />
+        <geom name="board_18x600x2400_part00__054" class="icra" type="box" size="0.009 0.3 1.2" pos="-2.723 -2.4025 0.3" quat="0.5 -0.5 -0.5 0.5" />
+        <geom name="board_50x50x300_part00__055" class="icra" type="box" size="0.025 0.025 0.15" pos="6.72 3.5865 0.45" quat="0 0 0 1" />
+        <geom name="board_50x50x300_part00__056" class="icra" type="box" size="0.025 0.025 0.15" pos="6.72 2.4365 0.45" quat="0 0 0 1" />
+        <geom name="board_50x50x300_part00__057" class="icra" type="box" size="0.025 0.025 0.15" pos="-0.43 4.7865 0.45" quat="0 0 0 1" />
+        <geom name="board_50x50x300_part00__058" class="icra" type="box" size="0.025 0.025 0.15" pos="-0.43 3.6505 0.45" quat="0 0 0 1" />
+        <geom name="board_50x50x300_part00__059" class="icra" type="box" size="0.025 0.025 0.15" pos="4.32 4.7865 0.45" quat="0 0 0 1" />
+        <geom name="board_50x50x300_part00__060" class="icra" type="box" size="0.025 0.025 0.15" pos="4.32 3.6545 0.45" quat="0 0 0 1" />
+        <geom name="board_50x50x300_part00__061" class="icra" type="box" size="0.025 0.025 0.15" pos="1.97 3.5865 0.45" quat="0 0 0 1" />
+        <geom name="board_50x50x300_part00__062" class="icra" type="box" size="0.025 0.025 0.15" pos="1.97 2.4365 0.45" quat="0 0 0 1" />
+        <geom name="board_50x50x300_part00__063" class="icra" type="box" size="0.025 0.025 0.15" pos="0.852 3.5865 0.45" quat="0 0 0 1" />
+        <geom name="board_50x50x300_part00__064" class="icra" type="box" size="0.025 0.025 0.15" pos="0.852 2.4365 0.45" quat="0 0 0 1" />
+        <geom name="board_50x50x300_part00__065" class="icra" type="box" size="0.025 0.025 0.15" pos="-6.298 4.7865 0.45" quat="0 0 0 1" />
+        <geom name="board_50x50x300_part00__066" class="icra" type="box" size="0.025 0.025 0.15" pos="-6.298 3.6545 0.45" quat="0 0 0 1" />
+        <geom name="board_50x50x300_part00__067" class="icra" type="box" size="0.025 0.025 0.15" pos="-3.966 3.5685 0.45" quat="0 0 0 1" />
+        <geom name="board_50x50x300_part00__068" class="icra" type="box" size="0.025 0.025 0.15" pos="-5.116 3.5685 0.45" quat="0 0 0 1" />
+        <geom name="board_50x50x300_part00__069" class="icra" type="box" size="0.025 0.025 0.15" pos="-1.548 4.7865 0.45" quat="0 0 0 1" />
+        <geom name="board_50x50x300_part00__070" class="icra" type="box" size="0.025 0.025 0.15" pos="-1.48 3.6545 0.45" quat="0 0 0 1" />
+        <geom name="board_50x50x300_part00__071" class="icra" type="box" size="0.025 0.025 0.15" pos="-1.548 3.6545 0.45" quat="0 0 0 1" />
+        <geom name="board_50x50x300_part00__072" class="icra" type="box" size="0.025 0.025 0.15" pos="-3.898 3.5685 0.45" quat="0 0 0 1" />
+        <geom name="board_50x50x300_part00__073" class="icra" type="box" size="0.025 0.025 0.15" pos="-3.898 2.4365 0.45" quat="0 0 0 1" />
+        <geom name="board_50x50x300_part00__074" class="icra" type="box" size="0.025 0.025 0.15" pos="6.72 -3.5935 0.45" quat="0 0 0 1" />
+        <geom name="board_50x50x300_part00__075" class="icra" type="box" size="0.025 0.025 0.15" pos="6.72 -2.4365 0.45" quat="0 0 0 1" />
+        <geom name="board_50x50x300_part00__076" class="icra" type="box" size="0.025 0.025 0.15" pos="-0.43 -3.6365 0.45" quat="0 0 0 1" />
+        <geom name="board_50x50x300_part00__077" class="icra" type="box" size="0.025 0.025 0.15" pos="-0.43 -4.7905 0.45" quat="0 0 0 1" />
+        <geom name="board_50x50x300_part00__078" class="icra" type="box" size="0.025 0.025 0.15" pos="1.97 -2.4365 0.45" quat="0 0 0 1" />
+        <geom name="board_50x50x300_part00__079" class="icra" type="box" size="0.025 0.025 0.15" pos="1.97 -3.5755 0.45" quat="0 0 0 1" />
+        <geom name="board_50x50x300_part00__080" class="icra" type="box" size="0.025 0.025 0.15" pos="4.32 -4.7865 0.45" quat="0 0 0 1" />
+        <geom name="board_50x50x300_part00__081" class="icra" type="box" size="0.025 0.025 0.15" pos="4.32 -3.6365 0.45" quat="0 0 0 1" />
+        <geom name="board_50x50x300_part00__082" class="icra" type="box" size="0.025 0.025 0.15" pos="0.852 -3.5685 0.45" quat="0 0 0 1" />
+        <geom name="board_50x50x300_part00__083" class="icra" type="box" size="0.025 0.025 0.15" pos="0.852 -2.4365 0.45" quat="0 0 0 1" />
+        <geom name="board_50x50x300_part00__084" class="icra" type="box" size="0.025 0.025 0.15" pos="-6.298 -3.6545 0.45" quat="0 0 0 1" />
+        <geom name="board_50x50x300_part00__085" class="icra" type="box" size="0.025 0.025 0.15" pos="-6.298 -4.7865 0.45" quat="0 0 0 1" />
+        <geom name="board_50x50x300_part00__086" class="icra" type="box" size="0.025 0.025 0.15" pos="-5.116 -3.5755 0.45" quat="0 0 0 1" />
+        <geom name="board_50x50x300_part00__087" class="icra" type="box" size="0.025 0.025 0.15" pos="-1.548 -4.7865 0.45" quat="0 0 0 1" />
+        <geom name="board_50x50x300_part00__088" class="icra" type="box" size="0.025 0.025 0.15" pos="-1.548 -3.6365 0.45" quat="0 0 0 1" />
+        <geom name="board_50x50x300_part00__089" class="icra" type="box" size="0.025 0.025 0.15" pos="-1.48 -3.6295 0.45" quat="0 0 0 1" />
+        <geom name="board_50x50x300_part00__090" class="icra" type="box" size="0.025 0.025 0.15" pos="-3.898 -2.4365 0.45" quat="0 0 0 1" />
+        <geom name="board_50x50x300_part00__091" class="icra" type="box" size="0.025 0.025 0.15" pos="-3.966 -3.5755 0.45" quat="0 0 0 1" />
+        <geom name="board_50x50x300_part00__092" class="icra" type="box" size="0.025 0.025 0.15" pos="-3.898 -3.5755 0.45" quat="0 0 0 1" />
+        <geom name="crate_board_part00__093" class="icra" type="box" size="0.009 0.6 1.2" pos="5.545 -3.0115 0.12" quat="0 0.7071068 0 -0.7071068" />
+        <geom name="crate_board_part00__094" class="icra" type="box" size="0.009 0.6 1.2" pos="0.745 -4.2115 0.12" quat="0 0.7071068 0 -0.7071068" />
+        <geom name="crate_board_part00__095" class="icra" type="box" size="0.009 0.6 1.2" pos="3.145 -3.0115 0.12" quat="0 0.7071068 0 -0.7071068" />
+        <geom name="crate_board_part00__096" class="icra" type="box" size="0.009 0.6 1.2" pos="3.145 -4.2115 0.12" quat="0 0.7071068 0 -0.7071068" />
+        <geom name="k_rail_diagonal_part00__097" class="icra" type="box" size="0.025 0.05 0.7956915" pos="-0.898 -3.0115 0.061" quat="0.6502351 -0.6502351 0.2778387 -0.2778387" />
+        <geom name="k_rail_diagonal_part01__097" class="icra" type="box" size="0.025 0.05 0.7956915" pos="0.252 -3.0115 0.061" quat="0.2778387 -0.2778387 0.6502351 -0.6502351" />
+        <geom name="k_rail_diagonal_part00__098" class="icra" type="box" size="0.025 0.05 0.7956915" pos="-5.698 -4.2115 0.061" quat="0.6502351 0.6502351 0.2778387 0.2778387" />
+        <geom name="k_rail_diagonal_part01__098" class="icra" type="box" size="0.025 0.05 0.7956915" pos="-4.548 -4.2115 0.061" quat="0.2778387 0.2778387 0.6502351 0.6502351" />
+        <geom name="k_rail_diagonal_part00__099" class="icra" type="box" size="0.025 0.05 0.7956915" pos="-3.298 -4.2115 0.061" quat="0.6502351 0.6502351 0.2778387 0.2778387" />
+        <geom name="k_rail_diagonal_part01__099" class="icra" type="box" size="0.025 0.05 0.7956915" pos="-2.148 -4.2115 0.061" quat="0.2778387 0.2778387 0.6502351 0.6502351" />
+        <geom name="k_rail_diagonal_part00__100" class="icra" type="box" size="0.025 0.05 0.7956915" pos="-3.298 -3.0115 0.061" quat="0.6502351 -0.6502351 0.2778387 -0.2778387" />
+        <geom name="k_rail_diagonal_part01__100" class="icra" type="box" size="0.025 0.05 0.7956915" pos="-2.148 -3.0115 0.061" quat="0.2778387 -0.2778387 0.6502351 -0.6502351" />
+        <geom name="lane_floor_part00__101" class="icra" type="box" size="0.025 0.05 1.2" pos="5.545 2.4365 0.061" quat="0.5 0.5 -0.5 -0.5" />
+        <geom name="lane_floor_part01__101" class="icra" type="box" size="0.025 0.05 0.55" pos="4.37 3.0115 0.061" quat="0.7071068 0.7071068 0 0" />
+        <geom name="lane_floor_part02__101" class="icra" type="box" size="0.025 0.05 0.55" pos="6.72 3.0115 0.061" quat="0 0 0.7071068 0.7071068" />
+        <geom name="lane_floor_part03__101" class="icra" type="box" size="0.025 0.05 1.2" pos="5.545 3.5865 0.061" quat="0.5 0.5 -0.5 -0.5" />
+        <geom name="lane_floor_part04__101" class="icra" type="box" size="0.0055 0.6 1.2" pos="5.545 3.0115 0.0055" quat="0.7071068 0 0.7071068 0" />
+        <geom name="lane_floor_part00__102" class="icra" type="box" size="0.025 0.05 1.2" pos="0.745 3.6365 0.061" quat="0.5 0.5 -0.5 -0.5" />
+        <geom name="lane_floor_part01__102" class="icra" type="box" size="0.025 0.05 0.55" pos="-0.43 4.2115 0.061" quat="0.7071068 0.7071068 0 0" />
+        <geom name="lane_floor_part02__102" class="icra" type="box" size="0.025 0.05 0.55" pos="1.92 4.2115 0.061" quat="0 0 0.7071068 0.7071068" />
+        <geom name="lane_floor_part03__102" class="icra" type="box" size="0.025 0.05 1.2" pos="0.745 4.7865 0.061" quat="0.5 0.5 -0.5 -0.5" />
+        <geom name="lane_floor_part04__102" class="icra" type="box" size="0.0055 0.6 1.2" pos="0.745 4.2115 0.0055" quat="0.7071068 0 0.7071068 0" />
+        <geom name="lane_floor_part00__103" class="icra" type="box" size="0.025 0.05 1.2" pos="3.145 3.6365 0.061" quat="0.5 0.5 -0.5 -0.5" />
+        <geom name="lane_floor_part01__103" class="icra" type="box" size="0.025 0.05 0.55" pos="1.97 4.2115 0.061" quat="0.7071068 0.7071068 0 0" />
+        <geom name="lane_floor_part02__103" class="icra" type="box" size="0.025 0.05 0.55" pos="4.32 4.2115 0.061" quat="0 0 0.7071068 0.7071068" />
+        <geom name="lane_floor_part03__103" class="icra" type="box" size="0.025 0.05 1.2" pos="3.145 4.7865 0.061" quat="0.5 0.5 -0.5 -0.5" />
+        <geom name="lane_floor_part04__103" class="icra" type="box" size="0.0055 0.6 1.2" pos="3.145 4.2115 0.0055" quat="0.7071068 0 0.7071068 0" />
+        <geom name="lane_floor_part00__104" class="icra" type="box" size="0.025 0.05 1.2" pos="3.145 2.4365 0.061" quat="0.5 0.5 -0.5 -0.5" />
+        <geom name="lane_floor_part01__104" class="icra" type="box" size="0.025 0.05 0.55" pos="1.97 3.0115 0.061" quat="0.7071068 0.7071068 0 0" />
+        <geom name="lane_floor_part02__104" class="icra" type="box" size="0.025 0.05 0.55" pos="4.32 3.0115 0.061" quat="0 0 0.7071068 0.7071068" />
+        <geom name="lane_floor_part03__104" class="icra" type="box" size="0.025 0.05 1.2" pos="3.145 3.5865 0.061" quat="0.5 0.5 -0.5 -0.5" />
+        <geom name="lane_floor_part04__104" class="icra" type="box" size="0.0055 0.6 1.2" pos="3.145 3.0115 0.0055" quat="0.7071068 0 0.7071068 0" />
+        <geom name="lane_floor_part00__105" class="icra" type="box" size="0.025 0.05 1.2" pos="-0.323 2.4365 0.061" quat="0.5 0.5 -0.5 -0.5" />
+        <geom name="lane_floor_part01__105" class="icra" type="box" size="0.025 0.05 0.55" pos="-1.498 3.0115 0.061" quat="0.7071068 0.7071068 0 0" />
+        <geom name="lane_floor_part02__105" class="icra" type="box" size="0.025 0.05 0.55" pos="0.852 3.0115 0.061" quat="0 0 0.7071068 0.7071068" />
+        <geom name="lane_floor_part03__105" class="icra" type="box" size="0.025 0.05 1.2" pos="-0.323 3.5865 0.061" quat="0.5 0.5 -0.5 -0.5" />
+        <geom name="lane_floor_part04__105" class="icra" type="box" size="0.0055 0.6 1.2" pos="-0.323 3.0115 0.0055" quat="0.7071068 0 0.7071068 0" />
+        <geom name="lane_floor_part00__106" class="icra" type="box" size="0.025 0.05 1.2" pos="-5.123 3.6365 0.061" quat="0.5 0.5 -0.5 -0.5" />
+        <geom name="lane_floor_part01__106" class="icra" type="box" size="0.025 0.05 0.55" pos="-6.298 4.2115 0.061" quat="0.7071068 0.7071068 0 0" />
+        <geom name="lane_floor_part02__106" class="icra" type="box" size="0.025 0.05 0.55" pos="-3.948 4.2115 0.061" quat="0 0 0.7071068 0.7071068" />
+        <geom name="lane_floor_part03__106" class="icra" type="box" size="0.025 0.05 1.2" pos="-5.123 4.7865 0.061" quat="0.5 0.5 -0.5 -0.5" />
+        <geom name="lane_floor_part04__106" class="icra" type="box" size="0.0055 0.6 1.2" pos="-5.123 4.2115 0.0055" quat="0.7071068 0 0.7071068 0" />
+        <geom name="lane_floor_part00__107" class="icra" type="box" size="0.025 0.05 1.2" pos="-2.723 3.6365 0.061" quat="0.5 0.5 -0.5 -0.5" />
+        <geom name="lane_floor_part01__107" class="icra" type="box" size="0.025 0.05 0.55" pos="-3.898 4.2115 0.061" quat="0.7071068 0.7071068 0 0" />
+        <geom name="lane_floor_part02__107" class="icra" type="box" size="0.025 0.05 0.55" pos="-1.548 4.2115 0.061" quat="0 0 0.7071068 0.7071068" />
+        <geom name="lane_floor_part03__107" class="icra" type="box" size="0.025 0.05 1.2" pos="-2.723 4.7865 0.061" quat="0.5 0.5 -0.5 -0.5" />
+        <geom name="lane_floor_part04__107" class="icra" type="box" size="0.0055 0.6 1.2" pos="-2.723 4.2115 0.0055" quat="0.7071068 0 0.7071068 0" />
+        <geom name="lane_floor_part00__108" class="icra" type="box" size="0.025 0.05 1.2" pos="-2.723 2.4365 0.061" quat="0.5 0.5 -0.5 -0.5" />
+        <geom name="lane_floor_part01__108" class="icra" type="box" size="0.025 0.05 0.55" pos="-3.898 3.0115 0.061" quat="0.7071068 0.7071068 0 0" />
+        <geom name="lane_floor_part02__108" class="icra" type="box" size="0.025 0.05 0.55" pos="-1.548 3.0115 0.061" quat="0 0 0.7071068 0.7071068" />
+        <geom name="lane_floor_part03__108" class="icra" type="box" size="0.025 0.05 1.2" pos="-2.723 3.5865 0.061" quat="0.5 0.5 -0.5 -0.5" />
+        <geom name="lane_floor_part04__108" class="icra" type="box" size="0.0055 0.6 1.2" pos="-2.723 3.0115 0.0055" quat="0.7071068 0 0.7071068 0" />
+        <geom name="lane_floor_part00__109" class="icra" type="box" size="0.025 0.05 1.2" pos="5.545 -3.5865 0.061" quat="0.5 0.5 -0.5 -0.5" />
+        <geom name="lane_floor_part01__109" class="icra" type="box" size="0.025 0.05 0.55" pos="4.37 -3.0115 0.061" quat="0.7071068 0.7071068 0 0" />
+        <geom name="lane_floor_part02__109" class="icra" type="box" size="0.025 0.05 0.55" pos="6.72 -3.0115 0.061" quat="0 0 0.7071068 0.7071068" />
+        <geom name="lane_floor_part03__109" class="icra" type="box" size="0.025 0.05 1.2" pos="5.545 -2.4365 0.061" quat="0.5 0.5 -0.5 -0.5" />
+        <geom name="lane_floor_part04__109" class="icra" type="box" size="0.0055 0.6 1.2" pos="5.545 -3.0115 0.0055" quat="0.7071068 0 0.7071068 0" />
+        <geom name="lane_floor_part00__110" class="icra" type="box" size="0.025 0.05 1.2" pos="0.745 -4.7865 0.061" quat="0.5 0.5 -0.5 -0.5" />
+        <geom name="lane_floor_part01__110" class="icra" type="box" size="0.025 0.05 0.55" pos="-0.43 -4.2115 0.061" quat="0.7071068 0.7071068 0 0" />
+        <geom name="lane_floor_part02__110" class="icra" type="box" size="0.025 0.05 0.55" pos="1.92 -4.2115 0.061" quat="0 0 0.7071068 0.7071068" />
+        <geom name="lane_floor_part03__110" class="icra" type="box" size="0.025 0.05 1.2" pos="0.745 -3.6365 0.061" quat="0.5 0.5 -0.5 -0.5" />
+        <geom name="lane_floor_part04__110" class="icra" type="box" size="0.0055 0.6 1.2" pos="0.745 -4.2115 0.0055" quat="0.7071068 0 0.7071068 0" />
+        <geom name="lane_floor_part00__111" class="icra" type="box" size="0.025 0.05 1.2" pos="3.145 -3.5865 0.061" quat="0.5 0.5 -0.5 -0.5" />
+        <geom name="lane_floor_part01__111" class="icra" type="box" size="0.025 0.05 0.55" pos="1.97 -3.0115 0.061" quat="0.7071068 0.7071068 0 0" />
+        <geom name="lane_floor_part02__111" class="icra" type="box" size="0.025 0.05 0.55" pos="4.32 -3.0115 0.061" quat="0 0 0.7071068 0.7071068" />
+        <geom name="lane_floor_part03__111" class="icra" type="box" size="0.025 0.05 1.2" pos="3.145 -2.4365 0.061" quat="0.5 0.5 -0.5 -0.5" />
+        <geom name="lane_floor_part04__111" class="icra" type="box" size="0.0055 0.6 1.2" pos="3.145 -3.0115 0.0055" quat="0.7071068 0 0.7071068 0" />
+        <geom name="lane_floor_part00__112" class="icra" type="box" size="0.025 0.05 1.2" pos="3.145 -4.7865 0.061" quat="0.5 0.5 -0.5 -0.5" />
+        <geom name="lane_floor_part01__112" class="icra" type="box" size="0.025 0.05 0.55" pos="1.97 -4.2115 0.061" quat="0.7071068 0.7071068 0 0" />
+        <geom name="lane_floor_part02__112" class="icra" type="box" size="0.025 0.05 0.55" pos="4.32 -4.2115 0.061" quat="0 0 -0.7071068 -0.7071068" />
+        <geom name="lane_floor_part03__112" class="icra" type="box" size="0.025 0.05 1.2" pos="3.145 -3.6365 0.061" quat="0.5 0.5 -0.5 -0.5" />
+        <geom name="lane_floor_part04__112" class="icra" type="box" size="0.0055 0.6 1.2" pos="3.145 -4.2115 0.0055" quat="0.7071068 0 0.7071068 0" />
+        <geom name="lane_floor_part00__113" class="icra" type="box" size="0.025 0.05 1.2" pos="-0.323 -3.5865 0.061" quat="0.5 0.5 -0.5 -0.5" />
+        <geom name="lane_floor_part01__113" class="icra" type="box" size="0.025 0.05 0.55" pos="-1.498 -3.0115 0.061" quat="0.7071068 0.7071068 0 0" />
+        <geom name="lane_floor_part02__113" class="icra" type="box" size="0.025 0.05 0.55" pos="0.852 -3.0115 0.061" quat="0 0 0.7071068 0.7071068" />
+        <geom name="lane_floor_part03__113" class="icra" type="box" size="0.025 0.05 1.2" pos="-0.323 -2.4365 0.061" quat="0.5 0.5 -0.5 -0.5" />
+        <geom name="lane_floor_part04__113" class="icra" type="box" size="0.0055 0.6 1.2" pos="-0.323 -3.0115 0.0055" quat="0.7071068 0 0.7071068 0" />
+        <geom name="lane_floor_part00__114" class="icra" type="box" size="0.025 0.05 1.2" pos="-5.123 -4.7865 0.061" quat="0.5 0.5 -0.5 -0.5" />
+        <geom name="lane_floor_part01__114" class="icra" type="box" size="0.025 0.05 0.55" pos="-6.298 -4.2115 0.061" quat="0.7071068 0.7071068 0 0" />
+        <geom name="lane_floor_part02__114" class="icra" type="box" size="0.025 0.05 0.55" pos="-3.948 -4.2115 0.061" quat="0 0 0.7071068 0.7071068" />
+        <geom name="lane_floor_part03__114" class="icra" type="box" size="0.025 0.05 1.2" pos="-5.123 -3.6365 0.061" quat="0.5 0.5 -0.5 -0.5" />
+        <geom name="lane_floor_part04__114" class="icra" type="box" size="0.0055 0.6 1.2" pos="-5.123 -4.2115 0.0055" quat="0.7071068 0 0.7071068 0" />
+        <geom name="lane_floor_part00__115" class="icra" type="box" size="0.025 0.05 1.2" pos="-2.723 -4.7865 0.061" quat="0.5 0.5 -0.5 -0.5" />
+        <geom name="lane_floor_part01__115" class="icra" type="box" size="0.025 0.05 0.55" pos="-3.898 -4.2115 0.061" quat="0.7071068 0.7071068 0 0" />
+        <geom name="lane_floor_part02__115" class="icra" type="box" size="0.025 0.05 0.55" pos="-1.548 -4.2115 0.061" quat="0 0 0.7071068 0.7071068" />
+        <geom name="lane_floor_part03__115" class="icra" type="box" size="0.025 0.05 1.2" pos="-2.723 -3.6365 0.061" quat="0.5 0.5 -0.5 -0.5" />
+        <geom name="lane_floor_part04__115" class="icra" type="box" size="0.0055 0.6 1.2" pos="-2.723 -4.2115 0.0055" quat="0.7071068 0 0.7071068 0" />
+        <geom name="lane_floor_part00__116" class="icra" type="box" size="0.025 0.05 1.2" pos="-2.723 -3.5865 0.061" quat="0.5 0.5 -0.5 -0.5" />
+        <geom name="lane_floor_part01__116" class="icra" type="box" size="0.025 0.05 0.55" pos="-3.898 -3.0115 0.061" quat="0.7071068 0.7071068 0 0" />
+        <geom name="lane_floor_part02__116" class="icra" type="box" size="0.025 0.05 0.55" pos="-1.548 -3.0115 0.061" quat="0 0 0.7071068 0.7071068" />
+        <geom name="lane_floor_part03__116" class="icra" type="box" size="0.025 0.05 1.2" pos="-2.723 -2.4365 0.061" quat="0.5 0.5 -0.5 -0.5" />
+        <geom name="lane_floor_part04__116" class="icra" type="box" size="0.0055 0.6 1.2" pos="-2.723 -3.0115 0.0055" quat="0.7071068 0 0.7071068 0" />
+        <geom name="pallet_step_part00__117" class="icra" type="box" size="0.025 0.05 0.6" pos="-6.702 -0.6115 0.175" quat="0.5 -0.5 0.5 0.5" />
+        <geom name="pallet_step_part01__117" class="icra" type="box" size="0.05 0.05 0.075" pos="-5.602 -1.1615 0.075" quat="0 0 0 1" />
+        <geom name="pallet_step_part02__117" class="icra" type="box" size="0.05 0.05 0.075" pos="-6.702 -1.1615 0.075" quat="0 0 0 1" />
+        <geom name="pallet_step_part03__117" class="icra" type="box" size="0.05 0.05 0.075" pos="-5.602 -0.0615 0.075" quat="0 0 0 1" />
+        <geom name="pallet_step_part04__117" class="icra" type="box" size="0.05 0.05 0.075" pos="-6.702 -0.0615 0.075" quat="0 0 0 1" />
+        <geom name="pallet_step_part05__117" class="icra" type="box" size="0.025 0.05 0.6" pos="-6.152 -1.1615 0.175" quat="0.7071068 0 0.7071068 0" />
+        <geom name="pallet_step_part06__117" class="icra" type="box" size="0.025 0.05 0.6" pos="-5.602 -0.6115 0.175" quat="0.5 -0.5 0.5 0.5" />
+        <geom name="pallet_step_part07__117" class="icra" type="box" size="0.025 0.05 0.6" pos="-6.152 -0.0615 0.175" quat="0.7071068 0 0.7071068 0" />
+        <geom name="pallet_step_part08__117" class="icra" type="box" size="0.009 0.6 0.6" pos="-6.152 -0.6115 0.209" quat="0.7071068 0 -0.7071068 0" />
+        <geom name="pallet_step_part00__118" class="icra" type="box" size="0.025 0.05 0.6" pos="-6.702 0.6105 0.175" quat="0.5 -0.5 0.5 0.5" />
+        <geom name="pallet_step_part01__118" class="icra" type="box" size="0.05 0.05 0.075" pos="-5.602 0.0605 0.075" quat="0 0 0 1" />
+        <geom name="pallet_step_part02__118" class="icra" type="box" size="0.05 0.05 0.075" pos="-6.702 0.0605 0.075" quat="0 0 0 1" />
+        <geom name="pallet_step_part03__118" class="icra" type="box" size="0.05 0.05 0.075" pos="-5.602 1.1605 0.075" quat="0 0 0 1" />
+        <geom name="pallet_step_part04__118" class="icra" type="box" size="0.05 0.05 0.075" pos="-6.702 1.1605 0.075" quat="0 0 0 1" />
+        <geom name="pallet_step_part05__118" class="icra" type="box" size="0.025 0.05 0.6" pos="-6.152 0.0605 0.175" quat="0.7071068 0 0.7071068 0" />
+        <geom name="pallet_step_part06__118" class="icra" type="box" size="0.025 0.05 0.6" pos="-5.602 0.6105 0.175" quat="0.5 -0.5 0.5 0.5" />
+        <geom name="pallet_step_part07__118" class="icra" type="box" size="0.025 0.05 0.6" pos="-6.152 1.1605 0.175" quat="0.7071068 0 0.7071068 0" />
+        <geom name="pallet_step_part08__118" class="icra" type="box" size="0.009 0.6 0.6" pos="-6.152 0.6105 0.209" quat="0.7071068 0 -0.7071068 0" />
+        <geom name="pallet_step_with_pipe_part00__119" class="icra" type="box" size="0.025 0.05 0.6" pos="-5.502 -0.6115 0.175" quat="0.5 -0.5 0.5 0.5" />
+        <geom name="pallet_step_with_pipe_part01__119" class="icra" type="box" size="0.0055 0.3 0.6" pos="-4.952 -1.217 0.3" quat="0.5 0.5 -0.5 -0.5" />
+        <geom name="pallet_step_with_pipe_part02__119" class="icra" type="box" size="0.0055 0.3 0.6" pos="-4.952 -0.006 0.3" quat="0.5 0.5 -0.5 -0.5" />
+        <geom name="pallet_step_with_pipe_part03__119" class="icra" type="box" size="0.025 0.05 0.15" pos="-5.402 -0.0365 0.368" quat="0 -0.7071068 -0.7071068 0" />
+        <geom name="pallet_step_with_pipe_part04__119" class="icra" type="box" size="0.025 0.05 0.15" pos="-5.402 -1.1865 0.368" quat="0 -0.7071068 -0.7071068 0" />
+        <geom name="pallet_step_with_pipe_part05__119" class="icra" type="box" size="0.025 0.05 0.6" pos="-5.502 -0.6115 0.243" quat="0.5 0.5 0.5 -0.5" />
+        <geom name="pallet_step_with_pipe_part06__119" class="icra" type="box" size="0.05 0.05 0.075" pos="-4.402 -1.1615 0.075" quat="0 0 1 0" />
+        <geom name="pallet_step_with_pipe_part07__119" class="icra" type="box" size="0.05 0.05 0.075" pos="-5.502 -1.1615 0.075" quat="0.7071068 0 0 -0.7071068" />
+        <geom name="pallet_step_with_pipe_part08__119" class="icra" type="box" size="0.05 0.05 0.075" pos="-4.402 -0.0615 0.075" quat="0 0 1 0" />
+        <geom name="pallet_step_with_pipe_part09__119" class="icra" type="box" size="0.05 0.05 0.075" pos="-5.502 -0.0615 0.075" quat="0.7071068 0 0 -0.7071068" />
+        <geom name="pallet_step_with_pipe_part10__119" class="icra" type="box" size="0.025 0.05 0.6" pos="-4.952 -1.1615 0.175" quat="0.7071068 0 0.7071068 0" />
+        <geom name="pallet_step_with_pipe_part11__119" class="icra" type="box" size="0.025 0.05 0.6" pos="-4.402 -0.6115 0.175" quat="0.5 -0.5 0.5 0.5" />
+        <geom name="pallet_step_with_pipe_part12__119" class="icra" type="box" size="0.025 0.05 0.6" pos="-4.952 -0.0615 0.175" quat="0.7071068 0 0.7071068 0" />
+        <geom name="pallet_step_with_pipe_part13__119" class="icra" type="box" size="0.009 0.6 0.6" pos="-4.952 -0.6115 0.209" quat="0 0.7071068 0 -0.7071068" />
+        <geom name="pallet_step_with_pipe_part00__120" class="icra" type="box" size="0.025 0.05 0.6" pos="-4.302 -0.6115 0.175" quat="0.5 -0.5 0.5 0.5" />
+        <geom name="pallet_step_with_pipe_part01__120" class="icra" type="box" size="0.0055 0.3 0.6" pos="-3.752 -1.217 0.3" quat="0.5 0.5 -0.5 -0.5" />
+        <geom name="pallet_step_with_pipe_part02__120" class="icra" type="box" size="0.0055 0.3 0.6" pos="-3.752 -0.006 0.3" quat="0.5 0.5 -0.5 -0.5" />
+        <geom name="pallet_step_with_pipe_part03__120" class="icra" type="box" size="0.025 0.05 0.15" pos="-4.202 -0.0365 0.368" quat="0 -0.7071068 -0.7071068 0" />
+        <geom name="pallet_step_with_pipe_part04__120" class="icra" type="box" size="0.025 0.05 0.15" pos="-4.202 -1.1865 0.368" quat="0 -0.7071068 -0.7071068 0" />
+        <geom name="pallet_step_with_pipe_part05__120" class="icra" type="box" size="0.025 0.05 0.6" pos="-4.302 -0.6115 0.243" quat="0.5 0.5 0.5 -0.5" />
+        <geom name="pallet_step_with_pipe_part06__120" class="icra" type="box" size="0.05 0.05 0.075" pos="-3.202 -1.1615 0.075" quat="0 0 1 0" />
+        <geom name="pallet_step_with_pipe_part07__120" class="icra" type="box" size="0.05 0.05 0.075" pos="-4.302 -1.1615 0.075" quat="0.7071068 0 0 -0.7071068" />
+        <geom name="pallet_step_with_pipe_part08__120" class="icra" type="box" size="0.05 0.05 0.075" pos="-3.202 -0.0615 0.075" quat="0 0 1 0" />
+        <geom name="pallet_step_with_pipe_part09__120" class="icra" type="box" size="0.05 0.05 0.075" pos="-4.302 -0.0615 0.075" quat="0.7071068 0 0 -0.7071068" />
+        <geom name="pallet_step_with_pipe_part10__120" class="icra" type="box" size="0.025 0.05 0.6" pos="-3.752 -1.1615 0.175" quat="0.7071068 0 0.7071068 0" />
+        <geom name="pallet_step_with_pipe_part11__120" class="icra" type="box" size="0.025 0.05 0.6" pos="-3.202 -0.6115 0.175" quat="0.5 -0.5 0.5 0.5" />
+        <geom name="pallet_step_with_pipe_part12__120" class="icra" type="box" size="0.025 0.05 0.6" pos="-3.752 -0.0615 0.175" quat="0.7071068 0 0.7071068 0" />
+        <geom name="pallet_step_with_pipe_part13__120" class="icra" type="box" size="0.009 0.6 0.6" pos="-3.752 -0.6115 0.209" quat="0 0.7071068 0 -0.7071068" />
+        <geom name="pallet_step_with_pipe_part00__121" class="icra" type="box" size="0.025 0.05 0.6" pos="-4.302 0.6105 0.175" quat="0.5 -0.5 0.5 0.5" />
+        <geom name="pallet_step_with_pipe_part01__121" class="icra" type="box" size="0.0055 0.3 0.6" pos="-3.752 0.005 0.3" quat="0.5 0.5 -0.5 -0.5" />
+        <geom name="pallet_step_with_pipe_part02__121" class="icra" type="box" size="0.0055 0.3 0.6" pos="-3.752 1.216 0.3" quat="0.5 0.5 -0.5 -0.5" />
+        <geom name="pallet_step_with_pipe_part03__121" class="icra" type="box" size="0.025 0.05 0.15" pos="-4.202 1.1855 0.368" quat="0 -0.7071068 -0.7071068 0" />
+        <geom name="pallet_step_with_pipe_part04__121" class="icra" type="box" size="0.025 0.05 0.15" pos="-4.202 0.0355 0.368" quat="0 -0.7071068 -0.7071068 0" />
+        <geom name="pallet_step_with_pipe_part05__121" class="icra" type="box" size="0.025 0.05 0.6" pos="-4.302 0.6105 0.243" quat="0.5 0.5 0.5 -0.5" />
+        <geom name="pallet_step_with_pipe_part06__121" class="icra" type="box" size="0.05 0.05 0.075" pos="-3.202 0.0605 0.075" quat="0 0 1 0" />
+        <geom name="pallet_step_with_pipe_part07__121" class="icra" type="box" size="0.05 0.05 0.075" pos="-4.302 0.0605 0.075" quat="0.7071068 0 0 -0.7071068" />
+        <geom name="pallet_step_with_pipe_part08__121" class="icra" type="box" size="0.05 0.05 0.075" pos="-3.202 1.1605 0.075" quat="0 0 1 0" />
+        <geom name="pallet_step_with_pipe_part09__121" class="icra" type="box" size="0.05 0.05 0.075" pos="-4.302 1.1605 0.075" quat="0.7071068 0 0 -0.7071068" />
+        <geom name="pallet_step_with_pipe_part10__121" class="icra" type="box" size="0.025 0.05 0.6" pos="-3.752 0.0605 0.175" quat="0.7071068 0 0.7071068 0" />
+        <geom name="pallet_step_with_pipe_part11__121" class="icra" type="box" size="0.025 0.05 0.6" pos="-3.202 0.6105 0.175" quat="0.5 -0.5 0.5 0.5" />
+        <geom name="pallet_step_with_pipe_part12__121" class="icra" type="box" size="0.025 0.05 0.6" pos="-3.752 1.1605 0.175" quat="0.7071068 0 0.7071068 0" />
+        <geom name="pallet_step_with_pipe_part13__121" class="icra" type="box" size="0.009 0.6 0.6" pos="-3.752 0.6105 0.209" quat="0 0.7071068 0 -0.7071068" />
+        <geom name="pallet_step_with_pipe_part00__122" class="icra" type="box" size="0.025 0.05 0.6" pos="-5.502 0.6105 0.175" quat="0.5 -0.5 0.5 0.5" />
+        <geom name="pallet_step_with_pipe_part01__122" class="icra" type="box" size="0.0055 0.3 0.6" pos="-4.952 0.005 0.3" quat="0.5 0.5 -0.5 -0.5" />
+        <geom name="pallet_step_with_pipe_part02__122" class="icra" type="box" size="0.0055 0.3 0.6" pos="-4.952 1.216 0.3" quat="0.5 0.5 -0.5 -0.5" />
+        <geom name="pallet_step_with_pipe_part03__122" class="icra" type="box" size="0.025 0.05 0.15" pos="-5.402 1.1855 0.368" quat="0 -0.7071068 -0.7071068 0" />
+        <geom name="pallet_step_with_pipe_part04__122" class="icra" type="box" size="0.025 0.05 0.15" pos="-5.402 0.0355 0.368" quat="0 -0.7071068 -0.7071068 0" />
+        <geom name="pallet_step_with_pipe_part05__122" class="icra" type="box" size="0.025 0.05 0.6" pos="-5.502 0.6105 0.243" quat="0.5 0.5 0.5 -0.5" />
+        <geom name="pallet_step_with_pipe_part06__122" class="icra" type="box" size="0.05 0.05 0.075" pos="-4.402 0.0605 0.075" quat="0 0 1 0" />
+        <geom name="pallet_step_with_pipe_part07__122" class="icra" type="box" size="0.05 0.05 0.075" pos="-5.502 0.0605 0.075" quat="0.7071068 0 0 -0.7071068" />
+        <geom name="pallet_step_with_pipe_part08__122" class="icra" type="box" size="0.05 0.05 0.075" pos="-4.402 1.1605 0.075" quat="0 0 1 0" />
+        <geom name="pallet_step_with_pipe_part09__122" class="icra" type="box" size="0.05 0.05 0.075" pos="-5.502 1.1605 0.075" quat="0.7071068 0 0 -0.7071068" />
+        <geom name="pallet_step_with_pipe_part10__122" class="icra" type="box" size="0.025 0.05 0.6" pos="-4.952 0.0605 0.175" quat="0.7071068 0 0.7071068 0" />
+        <geom name="pallet_step_with_pipe_part11__122" class="icra" type="box" size="0.025 0.05 0.6" pos="-4.402 0.6105 0.175" quat="0.5 -0.5 0.5 0.5" />
+        <geom name="pallet_step_with_pipe_part12__122" class="icra" type="box" size="0.025 0.05 0.6" pos="-4.952 1.1605 0.175" quat="0.7071068 0 0.7071068 0" />
+        <geom name="pallet_step_with_pipe_part13__122" class="icra" type="box" size="0.009 0.6 0.6" pos="-4.952 0.6105 0.209" quat="0 0.7071068 0 -0.7071068" />
+        <geom name="pallet_step_with_pipe_part00__123" class="icra" type="box" size="0.025 0.05 0.6" pos="-6.152 1.2605 0.175" quat="0 0.7071068 0 -0.7071068" />
+        <geom name="pallet_step_with_pipe_part01__123" class="icra" type="box" size="0.0055 0.3 0.6" pos="-5.5465 1.8105 0.3" quat="0.7071068 0.7071068 0 0" />
+        <geom name="pallet_step_with_pipe_part02__123" class="icra" type="box" size="0.0055 0.3 0.6" pos="-6.7575 1.8105 0.3" quat="0.7071068 0.7071068 0 0" />
+        <geom name="pallet_step_with_pipe_part03__123" class="icra" type="box" size="0.025 0.05 0.15" pos="-6.727 1.3605 0.368" quat="0 0 1 0" />
+        <geom name="pallet_step_with_pipe_part04__123" class="icra" type="box" size="0.025 0.05 0.15" pos="-5.577 1.3605 0.368" quat="0 0 1 0" />
+        <geom name="pallet_step_with_pipe_part05__123" class="icra" type="box" size="0.025 0.05 0.6" pos="-6.152 1.2605 0.243" quat="0.7071068 0 0.7071068 0" />
+        <geom name="pallet_step_with_pipe_part06__123" class="icra" type="box" size="0.05 0.05 0.075" pos="-5.602 2.3605 0.075" quat="0 -0.7071068 0.7071068 0" />
+        <geom name="pallet_step_with_pipe_part07__123" class="icra" type="box" size="0.05 0.05 0.075" pos="-5.602 1.2605 0.075" />
+        <geom name="pallet_step_with_pipe_part08__123" class="icra" type="box" size="0.05 0.05 0.075" pos="-6.702 2.3605 0.075" quat="0 -0.7071068 0.7071068 0" />
+        <geom name="pallet_step_with_pipe_part09__123" class="icra" type="box" size="0.05 0.05 0.075" pos="-6.702 1.2605 0.075" />
+        <geom name="pallet_step_with_pipe_part10__123" class="icra" type="box" size="0.025 0.05 0.6" pos="-5.602 1.8105 0.175" quat="0.5 -0.5 0.5 0.5" />
+        <geom name="pallet_step_with_pipe_part11__123" class="icra" type="box" size="0.025 0.05 0.6" pos="-6.152 2.3605 0.175" quat="0 0.7071068 0 -0.7071068" />
+        <geom name="pallet_step_with_pipe_part12__123" class="icra" type="box" size="0.025 0.05 0.6" pos="-6.702 1.8105 0.175" quat="0.5 -0.5 0.5 0.5" />
+        <geom name="pallet_step_with_pipe_part13__123" class="icra" type="box" size="0.009 0.6 0.6" pos="-6.152 1.8105 0.209" quat="0.5 0.5 0.5 -0.5" />
+        <geom name="pallet_step_with_pipe_part00__124" class="icra" type="box" size="0.025 0.05 0.6" pos="-6.152 -1.2615 0.175" quat="0.7071068 0 0.7071068 0" />
+        <geom name="pallet_step_with_pipe_part01__124" class="icra" type="box" size="0.0055 0.3 0.6" pos="-6.7575 -1.8115 0.3" quat="0 0 -0.7071068 -0.7071068" />
+        <geom name="pallet_step_with_pipe_part02__124" class="icra" type="box" size="0.0055 0.3 0.6" pos="-5.5465 -1.8115 0.3" quat="0 0 -0.7071068 -0.7071068" />
+        <geom name="pallet_step_with_pipe_part03__124" class="icra" type="box" size="0.025 0.05 0.15" pos="-5.577 -1.3615 0.368" quat="0 -1 0 0" />
+        <geom name="pallet_step_with_pipe_part04__124" class="icra" type="box" size="0.025 0.05 0.15" pos="-6.727 -1.3615 0.368" quat="0 -1 0 0" />
+        <geom name="pallet_step_with_pipe_part05__124" class="icra" type="box" size="0.025 0.05 0.6" pos="-6.152 -1.2615 0.243" quat="0 0.7071068 0 -0.7071068" />
+        <geom name="pallet_step_with_pipe_part06__124" class="icra" type="box" size="0.05 0.05 0.075" pos="-6.702 -2.3615 0.075" quat="0 0.7071068 0.7071068 0" />
+        <geom name="pallet_step_with_pipe_part07__124" class="icra" type="box" size="0.05 0.05 0.075" pos="-6.702 -1.2615 0.075" quat="0 0 0 -1" />
+        <geom name="pallet_step_with_pipe_part08__124" class="icra" type="box" size="0.05 0.05 0.075" pos="-5.602 -2.3615 0.075" quat="0 0.7071068 0.7071068 0" />
+        <geom name="pallet_step_with_pipe_part09__124" class="icra" type="box" size="0.05 0.05 0.075" pos="-5.602 -1.2615 0.075" quat="0 0 0 -1" />
+        <geom name="pallet_step_with_pipe_part10__124" class="icra" type="box" size="0.025 0.05 0.6" pos="-6.702 -1.8115 0.175" quat="0.5 0.5 0.5 -0.5" />
+        <geom name="pallet_step_with_pipe_part11__124" class="icra" type="box" size="0.025 0.05 0.6" pos="-6.152 -2.3615 0.175" quat="0.7071068 0 0.7071068 0" />
+        <geom name="pallet_step_with_pipe_part12__124" class="icra" type="box" size="0.025 0.05 0.6" pos="-5.602 -1.8115 0.175" quat="0.5 0.5 0.5 -0.5" />
+        <geom name="pallet_step_with_pipe_part13__124" class="icra" type="box" size="0.009 0.6 0.6" pos="-6.152 -1.8115 0.209" quat="0.5 -0.5 0.5 0.5" />
+        <geom name="pallet_step_with_pipe_part00__125" class="icra" type="box" size="0.025 0.05 0.6" pos="-5.752 -2.4615 0.175" quat="0.7071068 0 0.7071068 0" />
+        <geom name="pallet_step_with_pipe_part01__125" class="icra" type="box" size="0.0055 0.3 0.6" pos="-6.3575 -3.0115 0.3" quat="0 0 -0.7071068 -0.7071068" />
+        <geom name="pallet_step_with_pipe_part02__125" class="icra" type="box" size="0.0055 0.3 0.6" pos="-5.1465 -3.0115 0.3" quat="0 0 -0.7071068 -0.7071068" />
+        <geom name="pallet_step_with_pipe_part03__125" class="icra" type="box" size="0.025 0.05 0.15" pos="-5.177 -2.5615 0.368" quat="0 -1 0 0" />
+        <geom name="pallet_step_with_pipe_part04__125" class="icra" type="box" size="0.025 0.05 0.15" pos="-6.327 -2.5615 0.368" quat="0 -1 0 0" />
+        <geom name="pallet_step_with_pipe_part05__125" class="icra" type="box" size="0.025 0.05 0.6" pos="-5.752 -2.4615 0.243" quat="0 0.7071068 0 -0.7071068" />
+        <geom name="pallet_step_with_pipe_part06__125" class="icra" type="box" size="0.05 0.05 0.075" pos="-6.302 -3.5615 0.075" quat="0 0.7071068 0.7071068 0" />
+        <geom name="pallet_step_with_pipe_part07__125" class="icra" type="box" size="0.05 0.05 0.075" pos="-6.302 -2.4615 0.075" quat="0 0 0 -1" />
+        <geom name="pallet_step_with_pipe_part08__125" class="icra" type="box" size="0.05 0.05 0.075" pos="-5.202 -3.5615 0.075" quat="0 0.7071068 0.7071068 0" />
+        <geom name="pallet_step_with_pipe_part09__125" class="icra" type="box" size="0.05 0.05 0.075" pos="-5.202 -2.4615 0.075" quat="0 0 0 -1" />
+        <geom name="pallet_step_with_pipe_part10__125" class="icra" type="box" size="0.025 0.05 0.6" pos="-6.302 -3.0115 0.175" quat="0.5 0.5 0.5 -0.5" />
+        <geom name="pallet_step_with_pipe_part11__125" class="icra" type="box" size="0.025 0.05 0.6" pos="-5.752 -3.5615 0.175" quat="0.7071068 0 0.7071068 0" />
+        <geom name="pallet_step_with_pipe_part12__125" class="icra" type="box" size="0.025 0.05 0.6" pos="-5.202 -3.0115 0.175" quat="0.5 0.5 0.5 -0.5" />
+        <geom name="pallet_step_with_pipe_part13__125" class="icra" type="box" size="0.009 0.6 0.6" pos="-5.752 -3.0115 0.209" quat="0.5 -0.5 0.5 0.5" />
+        <geom name="pallet_step_with_pipe_part00__126" class="icra" type="box" size="0.025 0.05 0.6" pos="-5.752 2.4615 0.175" quat="0 0.7071068 0 -0.7071068" />
+        <geom name="pallet_step_with_pipe_part01__126" class="icra" type="box" size="0.0055 0.3 0.6" pos="-5.1465 3.0115 0.3" quat="0.7071068 0.7071068 0 0" />
+        <geom name="pallet_step_with_pipe_part02__126" class="icra" type="box" size="0.0055 0.3 0.6" pos="-6.3575 3.0115 0.3" quat="0.7071068 0.7071068 0 0" />
+        <geom name="pallet_step_with_pipe_part03__126" class="icra" type="box" size="0.025 0.05 0.15" pos="-6.327 2.5615 0.368" quat="0 0 1 0" />
+        <geom name="pallet_step_with_pipe_part04__126" class="icra" type="box" size="0.025 0.05 0.15" pos="-5.177 2.5615 0.368" quat="0 0 1 0" />
+        <geom name="pallet_step_with_pipe_part05__126" class="icra" type="box" size="0.025 0.05 0.6" pos="-5.752 2.4615 0.243" quat="0.7071068 0 0.7071068 0" />
+        <geom name="pallet_step_with_pipe_part06__126" class="icra" type="box" size="0.05 0.05 0.075" pos="-5.202 3.5615 0.075" quat="0 -0.7071068 0.7071068 0" />
+        <geom name="pallet_step_with_pipe_part07__126" class="icra" type="box" size="0.05 0.05 0.075" pos="-5.202 2.4615 0.075" />
+        <geom name="pallet_step_with_pipe_part08__126" class="icra" type="box" size="0.05 0.05 0.075" pos="-6.302 3.5615 0.075" quat="0 -0.7071068 0.7071068 0" />
+        <geom name="pallet_step_with_pipe_part09__126" class="icra" type="box" size="0.05 0.05 0.075" pos="-6.302 2.4615 0.075" />
+        <geom name="pallet_step_with_pipe_part10__126" class="icra" type="box" size="0.025 0.05 0.6" pos="-5.202 3.0115 0.175" quat="0.5 -0.5 0.5 0.5" />
+        <geom name="pallet_step_with_pipe_part11__126" class="icra" type="box" size="0.025 0.05 0.6" pos="-5.752 3.5615 0.175" quat="0 0.7071068 0 -0.7071068" />
+        <geom name="pallet_step_with_pipe_part12__126" class="icra" type="box" size="0.025 0.05 0.6" pos="-6.302 3.0115 0.175" quat="0.5 -0.5 0.5 0.5" />
+        <geom name="pallet_step_with_pipe_part13__126" class="icra" type="box" size="0.009 0.6 0.6" pos="-5.752 3.0115 0.209" quat="0.5 0.5 0.5 -0.5" />
+        <geom name="pvc_pipe_100x1200_part00__127" class="icra" type="mesh" mesh="pvc_pipe_100x1200_part00" pos="-5.502 -0.6115 0.32" quat="0.7071068 0.7071068 0 0" />
+        <geom name="pvc_pipe_100x1200_part00__128" class="icra" type="mesh" mesh="pvc_pipe_100x1200_part00" pos="-4.302 -0.6115 0.32" quat="0.7071068 0.7071068 0 0" />
+        <geom name="pvc_pipe_100x1200_part00__129" class="icra" type="mesh" mesh="pvc_pipe_100x1200_part00" pos="-4.302 0.6105 0.32" quat="0.7071068 0.7071068 0 0" />
+        <geom name="pvc_pipe_100x1200_part00__130" class="icra" type="mesh" mesh="pvc_pipe_100x1200_part00" pos="-5.502 0.6105 0.32" quat="0.7071068 0.7071068 0 0" />
+        <geom name="pvc_pipe_100x1200_part00__131" class="icra" type="mesh" mesh="pvc_pipe_100x1200_part00" pos="-6.152 1.2605 0.32" quat="0.5 0.5 0.5 0.5" />
+        <geom name="pvc_pipe_100x1200_part00__132" class="icra" type="mesh" mesh="pvc_pipe_100x1200_part00" pos="-6.152 -1.2615 0.32" quat="0.5 0.5 -0.5 -0.5" />
+        <geom name="pvc_pipe_100x1200_part00__133" class="icra" type="mesh" mesh="pvc_pipe_100x1200_part00" pos="-5.752 -2.4615 0.32" quat="0.5 0.5 -0.5 -0.5" />
+        <geom name="pvc_pipe_100x1200_part00__134" class="icra" type="mesh" mesh="pvc_pipe_100x1200_part00" pos="-5.752 2.4615 0.32" quat="0.5 0.5 0.5 0.5" />
+        <geom name="ramp_part00__135" class="icra" type="box" size="0.009 0.075 0.275" pos="4.4651305 2.738 0.0840025" quat="0.7071068 0.7071068 0 0" />
+        <geom name="ramp_part01__135" class="icra" type="box" size="0.009 0.275 0.275" pos="4.7242019 2.738 0.100086" quat="0.5619779 0.5619779 -0.429163 0.429163" />
+        <geom name="ramp_part02__135" class="icra" type="mesh" mesh="ramp_part02" pos="4.724 2.738 0.095086" />
+        <geom name="ramp_part03__135" class="icra" type="mesh" mesh="ramp_part03" pos="4.724 2.738 0.095086" />
+        <geom name="ramp_part00__136" class="icra" type="box" size="0.009 0.075 0.275" pos="4.724 3.5468695 0.0840025" quat="0.5 0.5 -0.5 -0.5" />
+        <geom name="ramp_part01__136" class="icra" type="box" size="0.009 0.275 0.275" pos="4.724 3.2877981 0.100086" quat="0.7008424 0.0939143 -0.7008424 -0.0939143" />
+        <geom name="ramp_part02__136" class="icra" type="mesh" mesh="ramp_part02" pos="4.724 3.288 0.095086" quat="0.7071068 0 0 -0.7071068" />
+        <geom name="ramp_part03__136" class="icra" type="mesh" mesh="ramp_part03" pos="4.724 3.288 0.095086" quat="0.7071068 0 0 -0.7071068" />
+        <geom name="ramp_part00__137" class="icra" type="box" size="0.009 0.075 0.275" pos="5.5351305 2.738 0.0840025" quat="0.7071068 0.7071068 0 0" />
+        <geom name="ramp_part01__137" class="icra" type="box" size="0.009 0.275 0.275" pos="5.7942019 2.738 0.100086" quat="0.5619779 0.5619779 -0.429163 0.429163" />
+        <geom name="ramp_part02__137" class="icra" type="mesh" mesh="ramp_part02" pos="5.794 2.738 0.095086" />
+        <geom name="ramp_part03__137" class="icra" type="mesh" mesh="ramp_part03" pos="5.794 2.738 0.095086" />
+        <geom name="ramp_part00__138" class="icra" type="box" size="0.009 0.075 0.275" pos="5.794 3.5468695 0.0840025" quat="0.5 0.5 -0.5 -0.5" />
+        <geom name="ramp_part01__138" class="icra" type="box" size="0.009 0.275 0.275" pos="5.794 3.2877981 0.100086" quat="0.7008424 0.0939143 -0.7008424 -0.0939143" />
+        <geom name="ramp_part02__138" class="icra" type="mesh" mesh="ramp_part02" pos="5.794 3.288 0.095086" quat="0.7071068 0 0 -0.7071068" />
+        <geom name="ramp_part03__138" class="icra" type="mesh" mesh="ramp_part03" pos="5.794 3.288 0.095086" quat="0.7071068 0 0 -0.7071068" />
+        <geom name="ramp_part00__139" class="icra" type="box" size="0.009 0.075 0.275" pos="5.259 2.4791305 0.0840025" quat="0.5 0.5 0.5 0.5" />
+        <geom name="ramp_part01__139" class="icra" type="box" size="0.009 0.275 0.275" pos="5.259 2.7382019 0.100086" quat="0.0939143 0.7008424 0.0939143 0.7008424" />
+        <geom name="ramp_part02__139" class="icra" type="mesh" mesh="ramp_part02" pos="5.259 2.738 0.095086" quat="0.7071068 0 0 0.7071068" />
+        <geom name="ramp_part03__139" class="icra" type="mesh" mesh="ramp_part03" pos="5.259 2.738 0.095086" quat="0.7071068 0 0 0.7071068" />
+        <geom name="ramp_part00__140" class="icra" type="box" size="0.009 0.075 0.275" pos="5.5178695 3.288 0.0840025" quat="0 0 -0.7071068 -0.7071068" />
+        <geom name="ramp_part01__140" class="icra" type="box" size="0.009 0.275 0.275" pos="5.2587981 3.288 0.100086" quat="0.429163 -0.429163 -0.5619779 -0.5619779" />
+        <geom name="ramp_part02__140" class="icra" type="mesh" mesh="ramp_part02" pos="5.259 3.288 0.095086" quat="0 0 0 -1" />
+        <geom name="ramp_part03__140" class="icra" type="mesh" mesh="ramp_part03" pos="5.259 3.288 0.095086" quat="0 0 0 -1" />
+        <geom name="ramp_part00__141" class="icra" type="box" size="0.009 0.075 0.275" pos="6.329 2.4791305 0.0840025" quat="0.5 0.5 0.5 0.5" />
+        <geom name="ramp_part01__141" class="icra" type="box" size="0.009 0.275 0.275" pos="6.329 2.7382019 0.100086" quat="0.0939143 0.7008424 0.0939143 0.7008424" />
+        <geom name="ramp_part02__141" class="icra" type="mesh" mesh="ramp_part02" pos="6.329 2.738 0.095086" quat="0.7071068 0 0 0.7071068" />
+        <geom name="ramp_part03__141" class="icra" type="mesh" mesh="ramp_part03" pos="6.329 2.738 0.095086" quat="0.7071068 0 0 0.7071068" />
+        <geom name="ramp_part00__142" class="icra" type="box" size="0.009 0.075 0.275" pos="6.5878695 3.288 0.0840025" quat="0 0 -0.7071068 -0.7071068" />
+        <geom name="ramp_part01__142" class="icra" type="box" size="0.009 0.275 0.275" pos="6.3287981 3.288 0.100086" quat="0.429163 -0.429163 -0.5619779 -0.5619779" />
+        <geom name="ramp_part02__142" class="icra" type="mesh" mesh="ramp_part02" pos="6.329 3.288 0.095086" quat="0 0 0 -1" />
+        <geom name="ramp_part03__142" class="icra" type="mesh" mesh="ramp_part03" pos="6.329 3.288 0.095086" quat="0 0 0 -1" />
+        <geom name="ramp_part00__143" class="icra" type="box" size="0.009 0.075 0.275" pos="-0.3348695 3.938 0.0840025" quat="0.7071068 0.7071068 0 0" />
+        <geom name="ramp_part01__143" class="icra" type="box" size="0.009 0.275 0.275" pos="-0.0757981 3.938 0.100086" quat="0.5619779 0.5619779 -0.429163 0.429163" />
+        <geom name="ramp_part02__143" class="icra" type="mesh" mesh="ramp_part02" pos="-0.076 3.938 0.095086" />
+        <geom name="ramp_part03__143" class="icra" type="mesh" mesh="ramp_part03" pos="-0.076 3.938 0.095086" />
+        <geom name="ramp_part00__144" class="icra" type="box" size="0.009 0.075 0.275" pos="-0.076 4.7468695 0.0840025" quat="0.5 0.5 -0.5 -0.5" />
+        <geom name="ramp_part01__144" class="icra" type="box" size="0.009 0.275 0.275" pos="-0.076 4.4877981 0.100086" quat="0.7008424 0.0939143 -0.7008424 -0.0939143" />
+        <geom name="ramp_part02__144" class="icra" type="mesh" mesh="ramp_part02" pos="-0.076 4.488 0.095086" quat="0.7071068 0 0 -0.7071068" />
+        <geom name="ramp_part03__144" class="icra" type="mesh" mesh="ramp_part03" pos="-0.076 4.488 0.095086" quat="0.7071068 0 0 -0.7071068" />
+        <geom name="ramp_part00__145" class="icra" type="box" size="0.009 0.075 0.275" pos="0.7351305 3.938 0.0840025" quat="0.7071068 0.7071068 0 0" />
+        <geom name="ramp_part01__145" class="icra" type="box" size="0.009 0.275 0.275" pos="0.9942019 3.938 0.100086" quat="0.5619779 0.5619779 -0.429163 0.429163" />
+        <geom name="ramp_part02__145" class="icra" type="mesh" mesh="ramp_part02" pos="0.994 3.938 0.095086" />
+        <geom name="ramp_part03__145" class="icra" type="mesh" mesh="ramp_part03" pos="0.994 3.938 0.095086" />
+        <geom name="ramp_part00__146" class="icra" type="box" size="0.009 0.075 0.275" pos="0.994 4.7468695 0.0840025" quat="0.5 0.5 -0.5 -0.5" />
+        <geom name="ramp_part01__146" class="icra" type="box" size="0.009 0.275 0.275" pos="0.994 4.4877981 0.100086" quat="0.7008424 0.0939143 -0.7008424 -0.0939143" />
+        <geom name="ramp_part02__146" class="icra" type="mesh" mesh="ramp_part02" pos="0.994 4.488 0.095086" quat="0.7071068 0 0 -0.7071068" />
+        <geom name="ramp_part03__146" class="icra" type="mesh" mesh="ramp_part03" pos="0.994 4.488 0.095086" quat="0.7071068 0 0 -0.7071068" />
+        <geom name="ramp_part00__147" class="icra" type="box" size="0.009 0.075 0.275" pos="0.459 3.6791305 0.0840025" quat="0.5 0.5 0.5 0.5" />
+        <geom name="ramp_part01__147" class="icra" type="box" size="0.009 0.275 0.275" pos="0.459 3.9382019 0.100086" quat="0.0939143 0.7008424 0.0939143 0.7008424" />
+        <geom name="ramp_part02__147" class="icra" type="mesh" mesh="ramp_part02" pos="0.459 3.938 0.095086" quat="0.7071068 0 0 0.7071068" />
+        <geom name="ramp_part03__147" class="icra" type="mesh" mesh="ramp_part03" pos="0.459 3.938 0.095086" quat="0.7071068 0 0 0.7071068" />
+        <geom name="ramp_part00__148" class="icra" type="box" size="0.009 0.075 0.275" pos="0.7178695 4.488 0.0840025" quat="0 0 -0.7071068 -0.7071068" />
+        <geom name="ramp_part01__148" class="icra" type="box" size="0.009 0.275 0.275" pos="0.4587981 4.488 0.100086" quat="0.429163 -0.429163 -0.5619779 -0.5619779" />
+        <geom name="ramp_part02__148" class="icra" type="mesh" mesh="ramp_part02" pos="0.459 4.488 0.095086" quat="0 0 0 -1" />
+        <geom name="ramp_part03__148" class="icra" type="mesh" mesh="ramp_part03" pos="0.459 4.488 0.095086" quat="0 0 0 -1" />
+        <geom name="ramp_part00__149" class="icra" type="box" size="0.009 0.075 0.275" pos="1.529 3.6791305 0.0840025" quat="0.5 0.5 0.5 0.5" />
+        <geom name="ramp_part01__149" class="icra" type="box" size="0.009 0.275 0.275" pos="1.529 3.9382019 0.100086" quat="0.0939143 0.7008424 0.0939143 0.7008424" />
+        <geom name="ramp_part02__149" class="icra" type="mesh" mesh="ramp_part02" pos="1.529 3.938 0.095086" quat="0.7071068 0 0 0.7071068" />
+        <geom name="ramp_part03__149" class="icra" type="mesh" mesh="ramp_part03" pos="1.529 3.938 0.095086" quat="0.7071068 0 0 0.7071068" />
+        <geom name="ramp_part00__150" class="icra" type="box" size="0.009 0.075 0.275" pos="1.7878695 4.488 0.0840025" quat="0 0 -0.7071068 -0.7071068" />
+        <geom name="ramp_part01__150" class="icra" type="box" size="0.009 0.275 0.275" pos="1.5287981 4.488 0.100086" quat="0.429163 -0.429163 -0.5619779 -0.5619779" />
+        <geom name="ramp_part02__150" class="icra" type="mesh" mesh="ramp_part02" pos="1.529 4.488 0.095086" quat="0 0 0 -1" />
+        <geom name="ramp_part03__150" class="icra" type="mesh" mesh="ramp_part03" pos="1.529 4.488 0.095086" quat="0 0 0 -1" />
+        <geom name="ramp_part00__151" class="icra" type="box" size="0.009 0.075 0.275" pos="2.0651305 3.938 0.0840025" quat="0.7071068 0.7071068 0 0" />
+        <geom name="ramp_part01__151" class="icra" type="box" size="0.009 0.275 0.275" pos="2.3242019 3.938 0.100086" quat="0.5619779 0.5619779 -0.429163 0.429163" />
+        <geom name="ramp_part02__151" class="icra" type="mesh" mesh="ramp_part02" pos="2.324 3.938 0.095086" />
+        <geom name="ramp_part03__151" class="icra" type="mesh" mesh="ramp_part03" pos="2.324 3.938 0.095086" />
+        <geom name="ramp_part00__152" class="icra" type="box" size="0.009 0.075 0.275" pos="2.324 4.7468695 0.0840025" quat="0.5 0.5 -0.5 -0.5" />
+        <geom name="ramp_part01__152" class="icra" type="box" size="0.009 0.275 0.275" pos="2.324 4.4877981 0.100086" quat="0.7008424 0.0939143 -0.7008424 -0.0939143" />
+        <geom name="ramp_part02__152" class="icra" type="mesh" mesh="ramp_part02" pos="2.324 4.488 0.095086" quat="0.7071068 0 0 -0.7071068" />
+        <geom name="ramp_part03__152" class="icra" type="mesh" mesh="ramp_part03" pos="2.324 4.488 0.095086" quat="0.7071068 0 0 -0.7071068" />
+        <geom name="ramp_part00__153" class="icra" type="box" size="0.009 0.075 0.275" pos="3.1351305 3.938 0.0840025" quat="0.7071068 0.7071068 0 0" />
+        <geom name="ramp_part01__153" class="icra" type="box" size="0.009 0.275 0.275" pos="3.3942019 3.938 0.100086" quat="0.5619779 0.5619779 -0.429163 0.429163" />
+        <geom name="ramp_part02__153" class="icra" type="mesh" mesh="ramp_part02" pos="3.394 3.938 0.095086" />
+        <geom name="ramp_part03__153" class="icra" type="mesh" mesh="ramp_part03" pos="3.394 3.938 0.095086" />
+        <geom name="ramp_part00__154" class="icra" type="box" size="0.009 0.075 0.275" pos="3.394 4.7468695 0.0840025" quat="0.5 0.5 -0.5 -0.5" />
+        <geom name="ramp_part01__154" class="icra" type="box" size="0.009 0.275 0.275" pos="3.394 4.4877981 0.100086" quat="0.7008424 0.0939143 -0.7008424 -0.0939143" />
+        <geom name="ramp_part02__154" class="icra" type="mesh" mesh="ramp_part02" pos="3.394 4.488 0.095086" quat="0.7071068 0 0 -0.7071068" />
+        <geom name="ramp_part03__154" class="icra" type="mesh" mesh="ramp_part03" pos="3.394 4.488 0.095086" quat="0.7071068 0 0 -0.7071068" />
+        <geom name="ramp_part00__155" class="icra" type="box" size="0.009 0.075 0.275" pos="2.859 3.6791305 0.0840025" quat="0.5 0.5 0.5 0.5" />
+        <geom name="ramp_part01__155" class="icra" type="box" size="0.009 0.275 0.275" pos="2.859 3.9382019 0.100086" quat="0.0939143 0.7008424 0.0939143 0.7008424" />
+        <geom name="ramp_part02__155" class="icra" type="mesh" mesh="ramp_part02" pos="2.859 3.938 0.095086" quat="0.7071068 0 0 0.7071068" />
+        <geom name="ramp_part03__155" class="icra" type="mesh" mesh="ramp_part03" pos="2.859 3.938 0.095086" quat="0.7071068 0 0 0.7071068" />
+        <geom name="ramp_part00__156" class="icra" type="box" size="0.009 0.075 0.275" pos="3.1178695 4.488 0.0840025" quat="0 0 -0.7071068 -0.7071068" />
+        <geom name="ramp_part01__156" class="icra" type="box" size="0.009 0.275 0.275" pos="2.8587981 4.488 0.100086" quat="0.429163 -0.429163 -0.5619779 -0.5619779" />
+        <geom name="ramp_part02__156" class="icra" type="mesh" mesh="ramp_part02" pos="2.859 4.488 0.095086" quat="0 0 0 -1" />
+        <geom name="ramp_part03__156" class="icra" type="mesh" mesh="ramp_part03" pos="2.859 4.488 0.095086" quat="0 0 0 -1" />
+        <geom name="ramp_part00__157" class="icra" type="box" size="0.009 0.075 0.275" pos="3.929 3.6791305 0.0840025" quat="0.5 0.5 0.5 0.5" />
+        <geom name="ramp_part01__157" class="icra" type="box" size="0.009 0.275 0.275" pos="3.929 3.9382019 0.100086" quat="0.0939143 0.7008424 0.0939143 0.7008424" />
+        <geom name="ramp_part02__157" class="icra" type="mesh" mesh="ramp_part02" pos="3.929 3.938 0.095086" quat="0.7071068 0 0 0.7071068" />
+        <geom name="ramp_part03__157" class="icra" type="mesh" mesh="ramp_part03" pos="3.929 3.938 0.095086" quat="0.7071068 0 0 0.7071068" />
+        <geom name="ramp_part00__158" class="icra" type="box" size="0.009 0.075 0.275" pos="4.1878695 4.488 0.0840025" quat="0 0 -0.7071068 -0.7071068" />
+        <geom name="ramp_part01__158" class="icra" type="box" size="0.009 0.275 0.275" pos="3.9287981 4.488 0.100086" quat="0.429163 -0.429163 -0.5619779 -0.5619779" />
+        <geom name="ramp_part02__158" class="icra" type="mesh" mesh="ramp_part02" pos="3.929 4.488 0.095086" quat="0 0 0 -1" />
+        <geom name="ramp_part03__158" class="icra" type="mesh" mesh="ramp_part03" pos="3.929 4.488 0.095086" quat="0 0 0 -1" />
+        <geom name="ramp_part00__159" class="icra" type="box" size="0.009 0.075 0.275" pos="2.0651305 2.738 0.0840025" quat="0.7071068 0.7071068 0 0" />
+        <geom name="ramp_part01__159" class="icra" type="box" size="0.009 0.275 0.275" pos="2.3242019 2.738 0.100086" quat="0.5619779 0.5619779 -0.429163 0.429163" />
+        <geom name="ramp_part02__159" class="icra" type="mesh" mesh="ramp_part02" pos="2.324 2.738 0.095086" />
+        <geom name="ramp_part03__159" class="icra" type="mesh" mesh="ramp_part03" pos="2.324 2.738 0.095086" />
+        <geom name="ramp_part00__160" class="icra" type="box" size="0.009 0.075 0.275" pos="2.324 3.5468695 0.0840025" quat="0.5 0.5 -0.5 -0.5" />
+        <geom name="ramp_part01__160" class="icra" type="box" size="0.009 0.275 0.275" pos="2.324 3.2877981 0.100086" quat="0.7008424 0.0939143 -0.7008424 -0.0939143" />
+        <geom name="ramp_part02__160" class="icra" type="mesh" mesh="ramp_part02" pos="2.324 3.288 0.095086" quat="0.7071068 0 0 -0.7071068" />
+        <geom name="ramp_part03__160" class="icra" type="mesh" mesh="ramp_part03" pos="2.324 3.288 0.095086" quat="0.7071068 0 0 -0.7071068" />
+        <geom name="ramp_part00__161" class="icra" type="box" size="0.009 0.075 0.275" pos="3.1351305 2.738 0.0840025" quat="0.7071068 0.7071068 0 0" />
+        <geom name="ramp_part01__161" class="icra" type="box" size="0.009 0.275 0.275" pos="3.3942019 2.738 0.100086" quat="0.5619779 0.5619779 -0.429163 0.429163" />
+        <geom name="ramp_part02__161" class="icra" type="mesh" mesh="ramp_part02" pos="3.394 2.738 0.095086" />
+        <geom name="ramp_part03__161" class="icra" type="mesh" mesh="ramp_part03" pos="3.394 2.738 0.095086" />
+        <geom name="ramp_part00__162" class="icra" type="box" size="0.009 0.075 0.275" pos="3.394 3.5468695 0.0840025" quat="0.5 0.5 -0.5 -0.5" />
+        <geom name="ramp_part01__162" class="icra" type="box" size="0.009 0.275 0.275" pos="3.394 3.2877981 0.100086" quat="0.7008424 0.0939143 -0.7008424 -0.0939143" />
+        <geom name="ramp_part02__162" class="icra" type="mesh" mesh="ramp_part02" pos="3.394 3.288 0.095086" quat="0.7071068 0 0 -0.7071068" />
+        <geom name="ramp_part03__162" class="icra" type="mesh" mesh="ramp_part03" pos="3.394 3.288 0.095086" quat="0.7071068 0 0 -0.7071068" />
+        <geom name="ramp_part00__163" class="icra" type="box" size="0.009 0.075 0.275" pos="2.859 2.4791305 0.0840025" quat="0.5 0.5 0.5 0.5" />
+        <geom name="ramp_part01__163" class="icra" type="box" size="0.009 0.275 0.275" pos="2.859 2.7382019 0.100086" quat="0.0939143 0.7008424 0.0939143 0.7008424" />
+        <geom name="ramp_part02__163" class="icra" type="mesh" mesh="ramp_part02" pos="2.859 2.738 0.095086" quat="0.7071068 0 0 0.7071068" />
+        <geom name="ramp_part03__163" class="icra" type="mesh" mesh="ramp_part03" pos="2.859 2.738 0.095086" quat="0.7071068 0 0 0.7071068" />
+        <geom name="ramp_part00__164" class="icra" type="box" size="0.009 0.075 0.275" pos="3.1178695 3.288 0.0840025" quat="0 0 -0.7071068 -0.7071068" />
+        <geom name="ramp_part01__164" class="icra" type="box" size="0.009 0.275 0.275" pos="2.8587981 3.288 0.100086" quat="0.429163 -0.429163 -0.5619779 -0.5619779" />
+        <geom name="ramp_part02__164" class="icra" type="mesh" mesh="ramp_part02" pos="2.859 3.288 0.095086" quat="0 0 0 -1" />
+        <geom name="ramp_part03__164" class="icra" type="mesh" mesh="ramp_part03" pos="2.859 3.288 0.095086" quat="0 0 0 -1" />
+        <geom name="ramp_part00__165" class="icra" type="box" size="0.009 0.075 0.275" pos="3.929 2.4791305 0.0840025" quat="0.5 0.5 0.5 0.5" />
+        <geom name="ramp_part01__165" class="icra" type="box" size="0.009 0.275 0.275" pos="3.929 2.7382019 0.100086" quat="0.0939143 0.7008424 0.0939143 0.7008424" />
+        <geom name="ramp_part02__165" class="icra" type="mesh" mesh="ramp_part02" pos="3.929 2.738 0.095086" quat="0.7071068 0 0 0.7071068" />
+        <geom name="ramp_part03__165" class="icra" type="mesh" mesh="ramp_part03" pos="3.929 2.738 0.095086" quat="0.7071068 0 0 0.7071068" />
+        <geom name="ramp_part00__166" class="icra" type="box" size="0.009 0.075 0.275" pos="4.1878695 3.288 0.0840025" quat="0 0 -0.7071068 -0.7071068" />
+        <geom name="ramp_part01__166" class="icra" type="box" size="0.009 0.275 0.275" pos="3.9287981 3.288 0.100086" quat="0.429163 -0.429163 -0.5619779 -0.5619779" />
+        <geom name="ramp_part02__166" class="icra" type="mesh" mesh="ramp_part02" pos="3.929 3.288 0.095086" quat="0 0 0 -1" />
+        <geom name="ramp_part03__166" class="icra" type="mesh" mesh="ramp_part03" pos="3.929 3.288 0.095086" quat="0 0 0 -1" />
+        <geom name="stepover_1_part00__167" class="icra" type="box" size="0.025 0.05 0.55" pos="-5.473 4.2115 0.161" quat="0.7071068 0.7071068 0 0" />
+        <geom name="stepover_1_part01__167" class="icra" type="box" size="0.025 0.05 0.55" pos="-4.773 4.2115 0.161" quat="0.7071068 0.7071068 0 0" />
+        <geom name="stepover_1_part02__167" class="icra" type="box" size="0.025 0.05 0.55" pos="-5.123 4.7865 0.161" quat="0.5 0.5 -0.5 -0.5" />
+        <geom name="stepover_1_part03__167" class="icra" type="box" size="0.025 0.05 0.55" pos="-5.123 4.2115 0.161" quat="0.7071068 0.7071068 0 0" />
+        <geom name="stepover_1_part04__167" class="icra" type="box" size="0.025 0.05 0.55" pos="-5.123 3.6365 0.161" quat="0.5 0.5 -0.5 -0.5" />
+        <geom name="stepover_1_part00__168" class="icra" type="box" size="0.025 0.05 0.55" pos="-0.673 3.0115 0.161" quat="0.7071068 0.7071068 0 0" />
+        <geom name="stepover_1_part01__168" class="icra" type="box" size="0.025 0.05 0.55" pos="0.027 3.0115 0.161" quat="0.7071068 0.7071068 0 0" />
+        <geom name="stepover_1_part02__168" class="icra" type="box" size="0.025 0.05 0.55" pos="-0.323 3.5865 0.161" quat="0.5 0.5 -0.5 -0.5" />
+        <geom name="stepover_1_part03__168" class="icra" type="box" size="0.025 0.05 0.55" pos="-0.323 3.0115 0.161" quat="0.7071068 0.7071068 0 0" />
+        <geom name="stepover_1_part04__168" class="icra" type="box" size="0.025 0.05 0.55" pos="-0.323 2.4365 0.161" quat="0.5 0.5 -0.5 -0.5" />
+        <geom name="stepover_2_part00__169" class="icra" type="box" size="0.025 0.05 0.55" pos="-3.298 4.2114236 0.161001" quat="0.7071067 0.7071069 4.76e-05 4.64e-05" />
+        <geom name="stepover_2_part01__169" class="icra" type="mesh" mesh="stepover_2_part01" pos="-2.723 4.2115 0.161" />
+        <geom name="stepover_2_part02__169" class="icra" type="mesh" mesh="stepover_2_part02" pos="-2.723 4.2115 0.161" />
+        <geom name="stepover_2_part03__169" class="icra" type="box" size="0.0250001 0.05 0.7778175" pos="-2.723 4.2115 0.161" quat="0.270554 0.2705553 0.6532996 0.6532994" />
+        <geom name="stepover_2_part04__169" class="icra" type="box" size="0.025 0.05 0.6" pos="-2.7229236 3.6365 0.1609998" quat="0.5000335 0.500033 -0.4999662 -0.4999673" />
+        <geom name="stepover_2_part05__169" class="icra" type="box" size="0.025 0.05 0.6" pos="-2.7230764 4.7865 0.1610002" quat="0.5000335 0.5000329 -0.4999663 -0.4999673" />
+        <geom name="stepover_2_part06__169" class="icra" type="box" size="0.025 0.05 0.55" pos="-2.148 4.2115764 0.1609991" quat="0.7071067 0.7071069 4.76e-05 4.64e-05" />
+        <geom name="stepover_2_part00__170" class="icra" type="box" size="0.025 0.05 0.55" pos="-3.298 3.0114236 0.161001" quat="0.7071067 0.7071069 4.76e-05 4.64e-05" />
+        <geom name="stepover_2_part01__170" class="icra" type="mesh" mesh="stepover_2_part01" pos="-2.723 3.0115 0.161" />
+        <geom name="stepover_2_part02__170" class="icra" type="mesh" mesh="stepover_2_part02" pos="-2.723 3.0115 0.161" />
+        <geom name="stepover_2_part03__170" class="icra" type="box" size="0.0250001 0.05 0.7778175" pos="-2.723 3.0115 0.161" quat="0.270554 0.2705553 0.6532996 0.6532994" />
+        <geom name="stepover_2_part04__170" class="icra" type="box" size="0.025 0.05 0.6" pos="-2.7229236 2.4365 0.1609998" quat="0.5000335 0.500033 -0.4999662 -0.4999673" />
+        <geom name="stepover_2_part05__170" class="icra" type="box" size="0.025 0.05 0.6" pos="-2.7230764 3.5865 0.1610002" quat="0.5000335 0.5000329 -0.4999663 -0.4999673" />
+        <geom name="stepover_2_part06__170" class="icra" type="box" size="0.025 0.05 0.55" pos="-2.148 3.0115764 0.1609991" quat="0.7071067 0.7071069 4.76e-05 4.64e-05" />
+    </worldbody>
+</mujoco>

@@ -10,6 +10,9 @@ from mjlab.terrains.config import (
 )
 from mjlab.terrains.terrain_generator import TerrainGeneratorCfg
 
+from lorl_mjlab.terrains.icra_map import IcraVariant
+from lorl_mjlab.terrains.icra_terrain import IcraMapTerrainCfg, icra_patch_size
+
 ROUGH_TERRAINS_CFG = TerrainGeneratorCfg(
     size=(8.0, 8.0),
     border_width=20.0,
@@ -33,3 +36,23 @@ ROUGH_TERRAINS_CFG = TerrainGeneratorCfg(
     },
     add_lights=True,
 )
+
+
+def icra_terrains_cfg(variant: IcraVariant) -> TerrainGeneratorCfg:
+    """The ICRA2024 QRC course as a one-patch terrain grid.
+
+    A single 1x1 grid holding the whole course reuses mjlab's env-origin and border machinery
+    unchanged. Difficulty and curriculum are meaningless here: the layout is fixed.
+    """
+    size = icra_patch_size(variant)
+    return TerrainGeneratorCfg(
+        size=size,
+        border_width=2.0,
+        border_height=1.0,
+        num_rows=1,
+        num_cols=1,
+        curriculum=False,
+        color_scheme="none",
+        sub_terrains={"icra": IcraMapTerrainCfg(size=size, variant=variant)},
+        add_lights=True,
+    )
