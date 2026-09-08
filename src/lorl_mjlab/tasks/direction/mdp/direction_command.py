@@ -3,8 +3,9 @@
 from __future__ import annotations
 
 import math
+from collections.abc import Callable
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 import torch
@@ -12,13 +13,16 @@ from mjlab.entity import Entity
 from mjlab.managers.command_manager import CommandTerm, CommandTermCfg
 from mjlab.utils.lab_api.math import matrix_from_quat
 
+from lorl_mjlab.teleop import build_teleop_gui, heading_vector, teleop_state
+
 if TYPE_CHECKING:
+    import viser
     from mjlab.envs.manager_based_rl_env import ManagerBasedRlEnv
     from mjlab.viewer.debug_visualizer import DebugVisualizer
 
 
 class UniformDirectionCommand(CommandTerm):
-    r"""Command generator producing a directional command vector (Lee et al., 2020).
+    """Command generator producing a directional command vector (Lee et al., 2020).
 
     The command is a target horizontal heading in the robot's base frame plus a
     discrete turn direction: ``command = <cos(psi), sin(psi), turn>`` with
@@ -41,19 +45,58 @@ class UniformDirectionCommand(CommandTerm):
         self.metrics["turn_sign_error"] = torch.zeros(self.num_envs, device=self.device)
         self.metrics["v_pr"] = torch.zeros(self.num_envs, device=self.device)
 
-        # Command-aligned progress integrated per step; read by the terrain curriculum.
-        self.command_progress = torch.zeros(self.num_envs, device=self.device)
+        # Episode fraction spent under a turn command. The curriculum exempts
+        # turn-dominated episodes from demotion; see `turn_fraction`.
+        self._turn_steps = torch.zeros(self.num_envs, device=self.device)
+        self._episode_steps = torch.zeros(self.num_envs, device=self.device)
+
+        self.teleop = teleop_state
 
     @property
     def command(self) -> torch.Tensor:
         """The desired direction command in the base frame. Shape is (num_envs, 3)."""
         return self.dir_command_b
 
+    @property
+    def turn_fraction(self) -> torch.Tensor:
+        """Fraction of the current episode spent under a turn command. Shape (num_envs,)."""
+        return self._turn_steps / self._episode_steps.clamp(min=1.0)
+
+    def create_gui(
+        self,
+        name: str,
+        server: viser.ViserServer,
+        get_env_idx: Callable[[], int],
+        on_change: Callable[[], None] | None = None,
+        request_action: Callable[[str, Any], None] | None = None,
+    ) -> None:
+        """Build the teleop panel."""
+        del name, get_env_idx, request_action  # Unused.
+        build_teleop_gui(server, self.teleop, on_change)
+
+    def compute(self, dt: float) -> None:
+        """Resample/update as usual, then let teleop override the result.
+
+        The override must land *after* ``super().compute(dt)``: that is what runs
+        ``_resample_command`` (every 10 s and on every reset) and ``_update_command``
+        (which zeroes the command for standing envs every single step). Writing earlier --
+        or from outside the step -- gets clobbered by one or both. This runs inside
+        ``env.step`` before the observations are built, so the policy sees it the same step.
+        """
+        super().compute(dt)
+        if not self.teleop.enabled:
+            return
+        head_x, head_y = heading_vector(self.teleop)
+        self.dir_command_b[:, 0] = head_x
+        self.dir_command_b[:, 1] = head_y
+        self.dir_command_b[:, 2] = self.teleop.turn
+        # Otherwise `_update_command` re-zeroes the ~2% of envs sampled as standing.
+        self.is_standing_env[:] = False
+
     def reset(self, env_ids: torch.Tensor | slice | None) -> dict[str, float]:
-        if env_ids is None:
-            self.command_progress[:] = 0.0
-        else:
-            self.command_progress[env_ids] = 0.0
+        idx = slice(None) if env_ids is None else env_ids
+        self._turn_steps[idx] = 0.0
+        self._episode_steps[idx] = 0.0
         return super().reset(env_ids)
 
     def _update_metrics(self) -> None:
@@ -80,7 +123,10 @@ class UniformDirectionCommand(CommandTerm):
         v_pr = torch.sum(self.robot.data.root_link_lin_vel_b[:, :2] * cmd_dir, dim=-1)
         self.metrics["v_pr"] += v_pr / max_command_step
 
-        self.command_progress += v_pr * self._env.step_dt
+        # Direct read of the pivot share of the batch, so a change to the sampling weights is
+        # visible without waiting for an episode to end and flush the accumulated metrics.
+        is_pivot = (torch.norm(cmd_dir, dim=1) < 0.1) & (self.dir_command_b[:, 2].abs() > 0.1)
+        self._env.extras["log"]["Metrics/pivot_command_fraction"] = is_pivot.float().mean()
 
     def _resample_command(self, env_ids: torch.Tensor) -> None:
         r = torch.empty(len(env_ids), device=self.device)
@@ -95,11 +141,21 @@ class UniformDirectionCommand(CommandTerm):
         sign = torch.where(torch.rand(len(env_ids), device=self.device) < 0.5, -1.0, 1.0)
         self.dir_command_b[env_ids, 2] = torch.where(do_turn, sign, torch.zeros_like(sign))
 
-        self.is_standing_env[env_ids] = r.uniform_(0.0, 1.0) <= self.cfg.rel_standing_envs
+        standing = r.uniform_(0.0, 1.0) <= self.cfg.rel_standing_envs
+
+        # Turn in place: zero heading, turn forced to +/-1
+        pivot = (r.uniform_(0.0, 1.0) <= self.cfg.rel_turn_in_place_envs) & ~standing
+        self.dir_command_b[env_ids[pivot], :2] = 0.0
+        self.dir_command_b[env_ids[pivot], 2] = sign[pivot]
+
+        self.is_standing_env[env_ids] = standing
 
     def _update_command(self) -> None:
         standing_env_ids = self.is_standing_env.nonzero(as_tuple=False).flatten()
         self.dir_command_b[standing_env_ids, :] = 0.0
+
+        self._turn_steps += (self.dir_command_b[:, 2].abs() > 0.1).float()
+        self._episode_steps += 1.0
 
     # Visualization.
 
@@ -150,12 +206,13 @@ class UniformDirectionCommand(CommandTerm):
 @dataclass(kw_only=True)
 class UniformDirectionCommandCfg(CommandTermCfg):
     entity_name: str
-    rel_standing_envs: float = 0.0
+    rel_standing_envs: float = 0.02
     """Fraction of environments that should be standing still. Defaults to 0.0."""
     turn_prob: float = 0.3
     """Probability of sampling a non-zero turn command. With probability
-  ``turn_prob`` the turn direction is +/-1 (each with equal chance);
-  otherwise it is 0 (no rotation)."""
+    ``turn_prob`` the turn direction is +/-1 (each with equal chance)."""
+    rel_turn_in_place_envs: float = 0.1
+    """Fraction of environments commanded to pivot in place: zero heading, turn +/-1."""
 
     @dataclass
     class Ranges:
