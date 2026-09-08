@@ -1,22 +1,4 @@
-"""Left-right (sagittal) symmetry augmentation for the direction task.
-
-Used by rsl_rl PPO data augmentation (``RslRlSymmetryCfg``). The augmentation
-function mirrors every observation group the actor/critic read (``policy`` and
-``privileged``) plus the action vector across the robot's sagittal (x-z)
-plane, returning a 2x batch ``[original, mirrored]``.
-
-Unlike a hand-authored index table, the joint/actuator permutations are
-resolved by NAME at call time (via the entity's joint list, the ``joint_pos``
-action term's target list, and the per-ctrl actuator target names) rather than
-hardcoded against one specific ordering -- this only assumes the
-``{LEG}_{joint}_joint`` naming convention shared by the Go1 and AlienGo MJCFs
-(``FL_hip_joint``, ``FR_thigh_joint``, ...), not any particular declaration or
-actuator-resolution order.
-
-Foot-scan block order is fixed by this task's own
-``direction_env_cfg._FOOT_NAMES = ("fl", "fr", "rl", "rr")`` and ring sizes
-(6, 12, 18), so that permutation is hardcoded.
-"""
+"""Left-right (sagittal) symmetry augmentation for the direction task."""
 
 from __future__ import annotations
 
@@ -147,6 +129,7 @@ def _transform_group(env: ManagerBasedRlEnv, group: str, obs: torch.Tensor) -> t
         "base_lin_vel": lambda x: _vec_sign(x, [1.0, -1.0, 1.0]),
         "projected_gravity": lambda x: _vec_sign(x, [1.0, -1.0, 1.0]),
         "command": lambda x: _vec_sign(x, [1.0, -1.0, -1.0]),
+        "rest_command": lambda x: x.clone(),
         "forces": lambda x: _vec_sign(x, [1.0, -1.0, 1.0]),
         "torques": lambda x: _vec_sign(x, [-1.0, 1.0, -1.0]),
         "actuator_gains": lambda x: _t_gains(env, x),
@@ -187,9 +170,6 @@ def compute_symmetric_states(
     """
     if obs is not None:
         batch_size = obs.batch_size[0]
-        # Repeat along the batch dim only. tensordict advertises a `torch.Size` overload, but that
-        # path is broken at runtime (it forwards `*repeats[0]`, unpacking an int), so pass plain
-        # ints -- the implementation signature -- and silence the resulting overload mismatch.
         obs_aug = obs.repeat(2, *(1,) * (obs.ndim - 1))  # type: ignore
         # Keep `.keys()`: TensorDict.__iter__ walks the batch dim, not the keys.
         for group in obs.keys():  # noqa: SIM118
