@@ -35,6 +35,10 @@ src = ["src"]
 exclude = [".agents/"]
 line-length = 120
 
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I", "B"]
+ignore = ["B011"]
+
 [tool.ty.environment]
 extra-paths = ["typings"]
 
@@ -72,7 +76,6 @@ dev = [
     "pyright>=1.1.411",
     "pytest>=9.1.1",
     "ruff>=0.15.20",
-    # Only used by the offline `convert-icra-map` tool.
-    "trimesh[easy]>=4.5.0",
+    "trimesh[easy]>=4.5.0",    # Used by the `convert-icra-map` tool.
     "ty>=0.0.56",
 ]
