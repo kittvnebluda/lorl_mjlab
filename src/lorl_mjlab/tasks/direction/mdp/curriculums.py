@@ -8,7 +8,8 @@ import torch
 from mjlab.entity import Entity
 from mjlab.managers.scene_entity_config import SceneEntityCfg
 
-from .commands import UniformDirectionCommand
+from .direction_command import UniformDirectionCommand
+from .rest_command import RestCommand
 
 if TYPE_CHECKING:
     from mjlab.envs import ManagerBasedRlEnv
@@ -20,16 +21,23 @@ def terrain_levels_dir(
     env: ManagerBasedRlEnv,
     env_ids: torch.Tensor,
     command_name: str,
+    rest_command_name: str,
+    rest_fraction_threshold: float = 0.25,
+    turn_fraction_threshold: float = 0.25,
     asset_cfg: SceneEntityCfg = _DEFAULT_ASSET_CFG,
 ) -> dict[str, torch.Tensor]:
-    """Terrain curriculum driven by command-aligned progress over the whole episode.
+    """Terrain curriculum that promotes or demotes an env based on how far the robot travelled.
 
-    Uses ``UniformDirectionCommand.command_progress`` -- the per-step integral of
-    base-frame velocity projected onto the command active that step. Unlike net
-    world displacement, this does not cancel when an opposite command is resampled
-    mid-episode: a robot that tracks every command keeps accumulating distance.
-    Promote when it advanced far along its commands, demote when it barely moved.
-    Standing/turning-dominated episodes are guarded against demotion.
+    At every reset we measure ``distance``: the straight-line distance in the world XY plane between the
+    robot's final base position and the origin of the sub-terrain it was spawned on.
+
+    - Covered more than half a tile -> promote to a harder level.
+    - Covered less than a fifth of a tile -> demote to an easier level.
+    - Anything in between -> stay put.
+
+    Demotion is skipped for episodes that were not supposed to cover ground -- standing envs, and episodes
+    that spent at least ``rest_fraction_threshold`` / ``turn_fraction_threshold`` of their steps resting or
+    turning. Rest and turn are judged over the whole episode, not by the command's value at reset time.
     """
     asset: Entity = env.scene[asset_cfg.name]
 
@@ -40,26 +48,50 @@ def terrain_levels_dir(
 
     command_term = cast(UniformDirectionCommand, env.command_manager.get_term(command_name))
     assert command_term is not None
+    rest_term = cast(RestCommand, env.command_manager.get_term(rest_command_name))
+    assert rest_term is not None
 
     tile = terrain_generator.size[0]
-
-    command = command_term.command[env_ids]
-    progress = command_term.command_progress[env_ids]
-    v_pr = command_term.metrics["v_pr"][env_ids]
 
     distance = torch.norm(
         asset.data.root_link_pos_w[env_ids, :2] - env.scene.env_origins[env_ids, :2],
         dim=1,
     )
 
-    is_turning = torch.abs(command[:, 2]) >= 0.1
+    was_resting = rest_term.rest_fraction[env_ids] >= rest_fraction_threshold
+    was_turning = command_term.turn_fraction[env_ids] >= turn_fraction_threshold
     is_standing = command_term.is_standing_env[env_ids]
 
     move_up = distance > tile * 0.5
-    move_down = (progress < tile * 0.2) | (v_pr < 0.2)
-    move_down = move_down & ~is_turning & ~is_standing
+    move_down = distance < tile * 0.2
+    move_down = move_down & ~is_standing & ~was_resting & ~was_turning
+
+    # The first reset happens before any episode has been played: levels are still the
+    # random `max_init_terrain_level` spread and `distance` is ~0 for everyone, so acting on
+    # it would demote every env for not having moved yet. Upstream guards this the same way.
+    if env.common_step_counter == 0:
+        move_up = torch.zeros_like(move_up)
+        move_down = torch.zeros_like(move_down)
 
     terrain.update_env_origins(env_ids, move_up, move_down)
 
     levels = terrain.terrain_levels.float()
-    return {"min": levels.min(), "mean": levels.mean(), "max": levels.max()}
+    result: dict[str, torch.Tensor] = {
+        "min": levels.min(),
+        "mean": levels.mean(),
+        "max": levels.max(),
+        "distance": distance.mean(),
+        "v_pr": command_term.metrics["v_pr"][env_ids].mean(),
+    }
+
+    sub_terrain_names = list(terrain_generator.sub_terrains.keys())
+    terrain_origins = terrain.terrain_origins
+    assert terrain_origins is not None
+    if terrain_generator.curriculum:
+        types = terrain.terrain_types
+        for i, name in enumerate(sub_terrain_names):
+            mask = types == i
+            if mask.any():
+                result[f"level/{name}"] = levels[mask].mean()
+
+    return result
