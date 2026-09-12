@@ -35,14 +35,33 @@ uv run train Lorl-Direction-Rough-Unitree-Go1-Distill \
 
 Runs log to `logs/rsl_rl/<experiment_name>/`.
 
-## Layout
+## Teleop
 
+Drive the commands by hand while a policy runs. The controls live in the **Viser** viewer,
+so ask for it explicitly — `play` otherwise picks the native viewer whenever `$DISPLAY` is
+set, and the native viewer has no GUI panel:
+
+```bash
+uv run play Lorl-Direction-Rough-Unitree-Go1 --checkpoint-file <path> --viewer viser
 ```
-src/lorl_mjlab/
-├── robots/unitree_aliengo/   # AlienGo MJCF + actuator/collision config
-├── rl/                       # Distillation + PPO-symmetry config/runner extensions
-└── tasks/direction/          # Direction command, MDP terms, per-robot configs
-```
+
+Open the printed URL, expand **Commands → Teleop**, and tick `Enable`. Until then the
+command terms resample exactly as they always have.
+
+| Widget | Hotkey | Action |
+|---|---|---|
+| `Enable` | — | Master gate |
+| `Move` | `I` / `,` | Head forward (0°) / reverse (180°) |
+| `Heading (deg)` | `J` / `L` | Steer left / right, 15° per press |
+| `Turn` | `U` / `O` | Turn left / right; steps through {Left, None, Right} |
+| `Rest` | `SPACE` | Toggle the lie-down command |
+| `Stand` | `K` | Zero everything back to a stand |
+
+Hotkeys are browser-side, so they only fire while the viewer tab is focused and cannot
+collide with the native viewer's own keys. Commands are broadcast to **all** envs.
+
+Asserting `Rest` zeroes the heading the policy observes — that masking lives in
+`DirectionWithRestCommand.command`, not in a teleop special case.
 
 ## Dev
 

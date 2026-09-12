@@ -41,3 +41,15 @@ and type checking. Do not commit code that fails type checking.
   - Use functions and fixtures; do not use test classes.
   - Favor targeted, efficient tests over exhaustive edge-case coverage.
   - Prefer running individual tests rather than the full test suite to improve iteration speed.
+
+Follow **Conventional Commits** (`type(scope): subject`).
+
+- **Types:** `feat`, `fix`, `chore`, `docs`, `refactor`
+- **Scopes:** Package/area name (e.g., `hardware`, `nav2_params`, `bringup/launch`)
+
+**Rules:**
+
+1. **Atomic commits:** One logical change per commit; build/pass tests before committing.
+2. **Isolate changes:** Separate mechanical edits (format/rename) and `docs`/`chore` from behavioral `feat`/`fix`.
+3. **Selective staging:** Always stage specific files (`git add <file>` or `-p`); never `git add -A`.
+4. **On-demand only:** Only commit when explicitly asked; never bundle extra unrequested edits.
