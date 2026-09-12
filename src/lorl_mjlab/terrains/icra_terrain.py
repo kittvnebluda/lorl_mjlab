@@ -14,8 +14,7 @@ import numpy as np
 from mjlab.terrains.terrain_generator import SubTerrainCfg, TerrainGeometry, TerrainOutput
 from mjlab.terrains.utils import make_plane
 
-from lorl_mjlab.terrains import icra_map
-from lorl_mjlab.terrains.icra_map import IcraVariant
+from lorl_mjlab.terrains import IcraVariant, icra_map
 
 FLOOR_RGBA = (0.35, 0.36, 0.38, 1.0)
 
@@ -73,11 +72,11 @@ if __name__ == "__main__":
     from mjlab.terrains.terrain_generator import TerrainGenerator
     from mujoco import viewer
 
-    from lorl_mjlab.terrains.config import icra_terrains_cfg
+    from lorl_mjlab.terrains import icra_terrains_generator_cfg
 
     chosen: IcraVariant = "sloped" if "sloped" in sys.argv else "flat"
     viewer_spec = mujoco.MjSpec()
-    TerrainGenerator(cfg=icra_terrains_cfg(chosen), device="cpu").compile(viewer_spec)
+    TerrainGenerator(cfg=icra_terrains_generator_cfg(chosen), device="cpu").compile(viewer_spec)
     model = viewer_spec.compile()
     print(f"[icra] {chosen}: {model.ngeom} geoms, {model.nmesh} meshes")
 

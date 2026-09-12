@@ -2,8 +2,7 @@ import mujoco
 import pytest
 from mjlab.terrains.terrain_generator import TerrainGenerator
 
-from lorl_mjlab.terrains import icra_map
-from lorl_mjlab.terrains.config import icra_terrains_cfg
+from lorl_mjlab.terrains import icra_map, icra_terrains_generator_cfg
 
 
 @pytest.fixture(scope="module")
@@ -12,7 +11,7 @@ def compiled():
     models = {}
     for variant in icra_map.VARIANTS:
         spec = mujoco.MjSpec()
-        TerrainGenerator(cfg=icra_terrains_cfg(variant), device="cpu").compile(spec)
+        TerrainGenerator(cfg=icra_terrains_generator_cfg(variant), device="cpu").compile(spec)
         models[variant] = spec.compile()
     return models
 
