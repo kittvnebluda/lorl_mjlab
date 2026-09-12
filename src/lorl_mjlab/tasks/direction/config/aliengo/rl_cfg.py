@@ -10,17 +10,11 @@ from lorl_mjlab.rl.config import (
 )
 from lorl_mjlab.tasks.direction.mdp.symmetry import compute_symmetric_states
 
-# The PPO actor is a privileged "teacher": it reads both the policy (proprio)
-# and privileged (teacher-only) observation groups, matching the source
-# IsaacLab training setup. The Distill variant later trains a proprio-only
-# "student" to imitate this teacher.
-_TEACHER_OBS_GROUPS = {"actor": ("policy", "privileged"), "critic": ("policy", "privileged")}
-
 
 def unitree_aliengo_direction_ppo_runner_cfg() -> RslRlOnPolicyRunnerCfg:
     """Create PPO runner configuration for Unitree AlienGo direction task."""
     return RslRlOnPolicyRunnerCfg(
-        obs_groups=dict(_TEACHER_OBS_GROUPS),
+        obs_groups={"actor": ("policy", "privileged"), "critic": ("policy", "privileged")},
         actor=RslRlModelCfg(
             hidden_dims=(512, 256, 256, 128),
             activation="elu",

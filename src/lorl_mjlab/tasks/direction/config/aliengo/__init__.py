@@ -1,6 +1,8 @@
+from mjlab.rl.runner import MjlabOnPolicyRunner
 from mjlab.tasks.registry import register_mjlab_task
 
-from lorl_mjlab.rl import LorlDistillationRunner, LorlOnPolicyRunner
+from lorl_mjlab.rl import LorlDistillationRunner
+from lorl_mjlab.tasks.registry import register_play_task
 
 from .env_cfgs import unitree_aliengo_direction_env_cfg
 from .rl_cfg import (
@@ -13,7 +15,7 @@ register_mjlab_task(
     env_cfg=unitree_aliengo_direction_env_cfg(),
     play_env_cfg=unitree_aliengo_direction_env_cfg(play=True),
     rl_cfg=unitree_aliengo_direction_ppo_runner_cfg(),
-    runner_cls=LorlOnPolicyRunner,
+    runner_cls=MjlabOnPolicyRunner,
 )
 
 register_mjlab_task(
@@ -23,3 +25,17 @@ register_mjlab_task(
     rl_cfg=unitree_aliengo_direction_distillation_runner_cfg(),
     runner_cls=LorlDistillationRunner,
 )
+
+for _variant in ("flat", "sloped"):
+    register_play_task(
+        task_id=f"Lorl-Direction-Icra-{_variant.capitalize()}-Unitree-AlienGo",
+        play_env_cfg=unitree_aliengo_direction_env_cfg(play=True, icra=_variant),
+        rl_cfg=unitree_aliengo_direction_ppo_runner_cfg(),
+        runner_cls=MjlabOnPolicyRunner,
+    )
+    register_play_task(
+        task_id=f"Lorl-Direction-Icra-{_variant.capitalize()}-Unitree-AlienGo-Distill",
+        play_env_cfg=unitree_aliengo_direction_env_cfg(play=True, distill=True, icra=_variant),
+        rl_cfg=unitree_aliengo_direction_distillation_runner_cfg(),
+        runner_cls=LorlDistillationRunner,
+    )
