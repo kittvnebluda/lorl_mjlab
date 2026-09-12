@@ -37,7 +37,7 @@ line-length = 120
 
 [tool.ruff.lint]
 select = ["E4", "E7", "E9", "F", "I", "B"]
-ignore = ["B011"]
+ignore = ["B011", "B905"]
 
 [tool.ty.environment]
 extra-paths = ["typings"]

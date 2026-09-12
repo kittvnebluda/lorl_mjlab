@@ -62,13 +62,15 @@ def main():
         outs = [o for o in (out if isinstance(out, tuple) else (out,)) if o is not None]
         act_t, state_t = outs[0], outs[1:]
 
-        feeds = {names[0]: obs.numpy(), **{n: s for n, s in zip(names[1:], state_o)}}
+        feeds = {names[0]: obs.numpy(), **{n: s for n, s in zip(names[1:], state_o, strict=True)}}
         res = sess.run(None, feeds)
         act_o, state_o = np.asarray(res[0]), res[1:]
 
         worst_act = max(worst_act, float(np.abs(act_t.numpy() - act_o).max()))
         if state_t:
-            worst_state = max(worst_state, max(float(np.abs(a.numpy() - b).max()) for a, b in zip(state_t, state_o)))
+            worst_state = max(
+                worst_state, max(float(np.abs(a.numpy() - b).max()) for a, b in zip(state_t, state_o, strict=True))
+            )
         if t < 3 or t == args.steps - 1:
             print(
                 f"  step {t:3d}  |act| max {np.abs(act_o).max():.6f}   act diff {worst_act:.3e}   state diff {worst_state:.3e}"
