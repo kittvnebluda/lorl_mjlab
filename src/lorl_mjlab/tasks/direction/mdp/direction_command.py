@@ -21,7 +21,7 @@ if TYPE_CHECKING:
     from mjlab.viewer.debug_visualizer import DebugVisualizer
 
 
-class UniformDirectionCommand(CommandTerm):
+class DirectionCommand(CommandTerm):
     """Command generator producing a directional command vector (Lee et al., 2020).
 
     The command is a target horizontal heading in the robot's base frame plus a
@@ -31,9 +31,9 @@ class UniformDirectionCommand(CommandTerm):
     policy determines its own speed based on terrain.
     """
 
-    cfg: UniformDirectionCommandCfg
+    cfg: DirectionCommandCfg
 
-    def __init__(self, cfg: UniformDirectionCommandCfg, env: ManagerBasedRlEnv):
+    def __init__(self, cfg: DirectionCommandCfg, env: ManagerBasedRlEnv):
         super().__init__(cfg, env)
 
         self.robot: Entity = env.scene[cfg.entity_name]
@@ -107,7 +107,11 @@ class UniformDirectionCommand(CommandTerm):
         vel_norm = torch.norm(vel_xy_b, dim=-1, keepdim=True)
         vel_dir_b = torch.where(vel_norm > 1e-5, vel_xy_b / vel_norm, torch.zeros_like(vel_xy_b))
 
-        cmd_dir = self.dir_command_b[:, :2]
+        # Read through ``command``, not ``dir_command_b``: a subclass that masks the command
+        # (see ``DirectionWithRestCommand``) must not accrue error against a heading the robot
+        # was told to ignore.
+        cmd = self.command
+        cmd_dir = cmd[:, :2]
 
         # Direction alignment error (angle between commanded and actual direction).
         dot_prod = torch.sum(cmd_dir * vel_dir_b, dim=-1).clamp(-1.0, 1.0)
@@ -116,7 +120,7 @@ class UniformDirectionCommand(CommandTerm):
 
         # Turning alignment error: commanded turn dir vs. sign of actual yaw rate.
         actual_turn_dir = torch.sign(self.robot.data.root_link_ang_vel_b[:, 2])
-        turn_error = torch.abs(self.dir_command_b[:, 2] - actual_turn_dir)
+        turn_error = torch.abs(cmd[:, 2] - actual_turn_dir)
         self.metrics["turn_sign_error"] += turn_error / max_command_step
 
         # Velocity projection (v_pr) onto the commanded direction.
@@ -125,7 +129,7 @@ class UniformDirectionCommand(CommandTerm):
 
         # Direct read of the pivot share of the batch, so a change to the sampling weights is
         # visible without waiting for an episode to end and flush the accumulated metrics.
-        is_pivot = (torch.norm(cmd_dir, dim=1) < 0.1) & (self.dir_command_b[:, 2].abs() > 0.1)
+        is_pivot = (torch.norm(cmd_dir, dim=1) < 0.1) & (cmd[:, 2].abs() > 0.1)
         self._env.extras["log"]["Metrics/pivot_command_fraction"] = is_pivot.float().mean()
 
     def _resample_command(self, env_ids: torch.Tensor) -> None:
@@ -154,7 +158,7 @@ class UniformDirectionCommand(CommandTerm):
         standing_env_ids = self.is_standing_env.nonzero(as_tuple=False).flatten()
         self.dir_command_b[standing_env_ids, :] = 0.0
 
-        self._turn_steps += (self.dir_command_b[:, 2].abs() > 0.1).float()
+        self._turn_steps += (self.command[:, 2].abs() > 0.1).float()
         self._episode_steps += 1.0
 
     # Visualization.
@@ -203,8 +207,27 @@ class UniformDirectionCommand(CommandTerm):
                 visualizer.add_arrow(origin, turn_end, color=(0.9, 0.6, 0.0, 0.8), width=0.02)
 
 
+class DirectionWithRestCommand(DirectionCommand):
+    """Direction command that goes silent wherever a rest command is active.
+
+    ``dir_command_b`` keeps the raw sampled heading, so the command survives a rest episode
+    and comes back unchanged on release instead of waiting for the next resample.
+    """
+
+    def __init__(self, cfg: DirectionWithRestCommandCfg, env: ManagerBasedRlEnv):
+        super().__init__(cfg, env)
+        self._rest_command_name = cfg.rest_command_name
+
+    @property
+    def command(self) -> torch.Tensor:
+        """The direction command, zeroed while resting. Shape is (num_envs, 3)."""
+        rest = self._env.command_manager.get_command(self._rest_command_name)
+        assert rest is not None
+        return self.dir_command_b * (1.0 - rest)
+
+
 @dataclass(kw_only=True)
-class UniformDirectionCommandCfg(CommandTermCfg):
+class DirectionCommandCfg(CommandTermCfg):
     entity_name: str
     rel_standing_envs: float = 0.02
     """Fraction of environments that should be standing still. Defaults to 0.0."""
@@ -228,5 +251,14 @@ class UniformDirectionCommandCfg(CommandTermCfg):
 
     viz: VizCfg = field(default_factory=VizCfg)
 
-    def build(self, env: ManagerBasedRlEnv) -> UniformDirectionCommand:
-        return UniformDirectionCommand(self, env)
+    def build(self, env: ManagerBasedRlEnv) -> DirectionCommand:
+        return DirectionCommand(self, env)
+
+
+@dataclass(kw_only=True)
+class DirectionWithRestCommandCfg(DirectionCommandCfg):
+    rest_command_name: str = "rest"
+    """Name of the rest command term whose active envs zero this command."""
+
+    def build(self, env: ManagerBasedRlEnv) -> DirectionWithRestCommand:
+        return DirectionWithRestCommand(self, env)

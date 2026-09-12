@@ -1,7 +1,7 @@
 """Rest ("lie down and go slack") command term.
 
-Exclusivity with the direction command is enforced by masking at the point of consumption
-(:func:`effective_direction_command`) rather than by mutating the direction term's buffer.
+Exclusivity with the direction command is enforced by :class:`DirectionWithRestCommand`,
+which masks its own output on read.
 """
 
 from __future__ import annotations
@@ -18,19 +18,6 @@ from lorl_mjlab.teleop import teleop_state
 if TYPE_CHECKING:
     from mjlab.envs.manager_based_rl_env import ManagerBasedRlEnv
     from mjlab.viewer.debug_visualizer import DebugVisualizer
-
-
-def effective_direction_command(
-    env: ManagerBasedRlEnv,
-    command_name: str,
-    rest_command_name: str,
-) -> torch.Tensor:
-    """The direction command, masked to zero wherever the rest command is active."""
-    command = env.command_manager.get_command(command_name)
-    rest = env.command_manager.get_command(rest_command_name)
-    assert command is not None
-    assert rest is not None
-    return command * (1.0 - rest)
 
 
 class RestCommand(CommandTerm):

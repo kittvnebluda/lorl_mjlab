@@ -4,7 +4,6 @@
 * ``external_force_b``  <- ``mjlab.envs.mdp.apply_external_force_torque`` (reset)
 * ``external_torque_b`` <- ``mjlab.envs.mdp.apply_external_force_torque`` (reset)
 
-Privileged-only: feed to the critic / teacher, not the deployed actor.
 """
 
 from __future__ import annotations

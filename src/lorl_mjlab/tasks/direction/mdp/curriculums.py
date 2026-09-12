@@ -8,7 +8,7 @@ import torch
 from mjlab.entity import Entity
 from mjlab.managers.scene_entity_config import SceneEntityCfg
 
-from .direction_command import UniformDirectionCommand
+from .direction_command import DirectionCommand
 from .rest_command import RestCommand
 
 if TYPE_CHECKING:
@@ -21,7 +21,7 @@ def terrain_levels_dir(
     env: ManagerBasedRlEnv,
     env_ids: torch.Tensor,
     command_name: str,
-    rest_command_name: str,
+    rest_command_name: str | None = None,
     rest_fraction_threshold: float = 0.25,
     turn_fraction_threshold: float = 0.25,
     asset_cfg: SceneEntityCfg = _DEFAULT_ASSET_CFG,
@@ -38,6 +38,9 @@ def terrain_levels_dir(
     Demotion is skipped for episodes that were not supposed to cover ground -- standing envs, and episodes
     that spent at least ``rest_fraction_threshold`` / ``turn_fraction_threshold`` of their steps resting or
     turning. Rest and turn are judged over the whole episode, not by the command's value at reset time.
+
+    ``rest_command_name`` is optional: a task configured without a rest command simply has no rest
+    exemption to apply.
     """
     asset: Entity = env.scene[asset_cfg.name]
 
@@ -46,10 +49,12 @@ def terrain_levels_dir(
     terrain_generator = terrain.cfg.terrain_generator
     assert terrain_generator is not None
 
-    command_term = cast(UniformDirectionCommand, env.command_manager.get_term(command_name))
+    command_term = cast(DirectionCommand, env.command_manager.get_term(command_name))
     assert command_term is not None
-    rest_term = cast(RestCommand, env.command_manager.get_term(rest_command_name))
-    assert rest_term is not None
+    rest_term = None
+    if rest_command_name is not None:
+        rest_term = cast(RestCommand, env.command_manager.get_term(rest_command_name))
+        assert rest_term is not None
 
     tile = terrain_generator.size[0]
 
@@ -58,13 +63,14 @@ def terrain_levels_dir(
         dim=1,
     )
 
-    was_resting = rest_term.rest_fraction[env_ids] >= rest_fraction_threshold
     was_turning = command_term.turn_fraction[env_ids] >= turn_fraction_threshold
     is_standing = command_term.is_standing_env[env_ids]
 
     move_up = distance > tile * 0.5
     move_down = distance < tile * 0.2
-    move_down = move_down & ~is_standing & ~was_resting & ~was_turning
+    move_down = move_down & ~is_standing & ~was_turning
+    if rest_term is not None:
+        move_down = move_down & ~(rest_term.rest_fraction[env_ids] >= rest_fraction_threshold)
 
     # The first reset happens before any episode has been played: levels are still the
     # random `max_init_terrain_level` spread and `distance` is ~0 for everyone, so acting on
