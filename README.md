@@ -54,14 +54,10 @@ command terms resample exactly as they always have.
 | `Move` | `I` / `,` | Head forward (0°) / reverse (180°) |
 | `Heading (deg)` | `J` / `L` | Steer left / right, 15° per press |
 | `Turn` | `U` / `O` | Turn left / right; steps through {Left, None, Right} |
-| `Rest` | `SPACE` | Toggle the lie-down command |
 | `Stand` | `K` | Zero everything back to a stand |
 
 Hotkeys are browser-side, so they only fire while the viewer tab is focused and cannot
 collide with the native viewer's own keys. Commands are broadcast to **all** envs.
-
-Asserting `Rest` zeroes the heading the policy observes — that masking lives in
-`DirectionWithRestCommand.command`, not in a teleop special case.
 
 ## Dev
 
