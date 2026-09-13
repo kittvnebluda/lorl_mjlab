@@ -46,8 +46,9 @@ INIT_STATE = EntityCfg.InitialStateCfg(
 )
 
 # Trunk height above the mean foot height that a standing robot must not sag below.
-# Set at ~0.75x the nominal standing height (INIT_STATE z is 0.5)
-ALIENGO_STAND_HEIGHT_TARGET: float = 0.36
+# ~0.75x the nominal standing height, which is 0.349 m.
+# Not to be confused with INIT_STATE's own z (0.5)
+ALIENGO_STAND_HEIGHT_TARGET: float = 0.26
 
 ##
 # Collision config.
