@@ -72,7 +72,6 @@ def unitree_aliengo_direction_env_cfg(
         reduce="none",
         num_slots=1,
         history_length=4,
-        track_air_time=True,  # `soft_landing` -> `compute_first_contact`.
     )
     cfg.scene.sensors = (cfg.scene.sensors or ()) + (
         feet_ground_cfg,

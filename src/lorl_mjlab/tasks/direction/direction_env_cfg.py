@@ -333,15 +333,6 @@ def make_direction_env_cfg() -> ManagerBasedRlEnvCfg:
                 "force_threshold": 1.0,
             },
         ),
-        "stand_posture": RewardTermCfg(
-            func=mdp.stand_posture,
-            weight=0.5,
-            params={
-                "std": 0.5,
-                "command_name": "direction",
-                "asset_cfg": SceneEntityCfg("robot", joint_names=(".*",)),
-            },
-        ),
         "stand_height_shortfall": RewardTermCfg(
             func=mdp.stand_height_shortfall,
             weight=-2.0,
@@ -350,11 +341,6 @@ def make_direction_env_cfg() -> ManagerBasedRlEnvCfg:
                 "target_height": 0.0,  # Set per-robot.
                 "asset_cfg": SceneEntityCfg("robot", site_names=()),  # Set per-robot.
             },
-        ),
-        "base_soft_landing": RewardTermCfg(
-            func=mdp.soft_landing,
-            weight=-1.0e-5,
-            params={"sensor_name": "trunk_ground_touch"},
         ),
         "action_rate_l2": RewardTermCfg(func=mdp.action_rate_l2, weight=-3.0e-3),
         "feet_slide": RewardTermCfg(
