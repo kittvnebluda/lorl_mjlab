@@ -77,6 +77,8 @@ FEET_ONLY_COLLISION = CollisionCfg(
 # This enables all collisions.
 FULL_COLLISION = CollisionCfg(
     geom_names_expr=(".*_collision",),
+    contype=1,
+    conaffinity=1,
     # Harden all collision geoms.
     solref=(0.01, 1),
     # Configure feet colliders. Other colliders are frictionless (condim=1).
