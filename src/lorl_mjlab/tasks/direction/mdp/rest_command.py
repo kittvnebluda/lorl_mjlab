@@ -53,9 +53,9 @@ class RestCommand(CommandTerm):
         """The rest command. Shape is (num_envs, 1)."""
         return self.rest_b
 
-    def compute(self, dt: float) -> None:
+    def compute(self, dt: float | torch.Tensor, env_ids: torch.Tensor | None = None) -> None:
         """Resample/update as usual, then let teleop override the result."""
-        super().compute(dt)
+        super().compute(dt, env_ids)
         if not self.teleop.enabled:
             return
         self.is_resting[:] = self.teleop.rest
@@ -87,8 +87,12 @@ class RestCommand(CommandTerm):
         r = torch.empty(len(env_ids), device=self.device)
         self.is_resting[env_ids] = r.uniform_(0.0, 1.0) <= self.cfg.rest_prob
 
-    def _update_command(self) -> None:
+    def _update_command(self, env_ids: torch.Tensor | None = None) -> None:
         self.rest_b[:, 0] = self.is_resting.float()
+
+        # Skip on resets when `dt=0`
+        if env_ids is not None:
+            return
 
         # Grace timer: held at zero while resting, accumulating once released.
         self._since_release = torch.where(

@@ -74,16 +74,16 @@ class DirectionCommand(CommandTerm):
         del name, get_env_idx, request_action  # Unused.
         build_teleop_gui(server, self.teleop, on_change)
 
-    def compute(self, dt: float) -> None:
+    def compute(self, dt: float | torch.Tensor, env_ids: torch.Tensor | None = None) -> None:
         """Resample/update as usual, then let teleop override the result.
 
-        The override must land *after* ``super().compute(dt)``: that is what runs
+        The override must land *after* ``super().compute(dt, env_ids)``: that is what runs
         ``_resample_command`` (every 10 s and on every reset) and ``_update_command``
         (which zeroes the command for standing envs every single step). Writing earlier --
         or from outside the step -- gets clobbered by one or both. This runs inside
         ``env.step`` before the observations are built, so the policy sees it the same step.
         """
-        super().compute(dt)
+        super().compute(dt, env_ids)
         if not self.teleop.enabled:
             return
         head_x, head_y = heading_vector(self.teleop)
@@ -154,10 +154,13 @@ class DirectionCommand(CommandTerm):
 
         self.is_standing_env[env_ids] = standing
 
-    def _update_command(self) -> None:
+    def _update_command(self, env_ids: torch.Tensor | None = None) -> None:
         standing_env_ids = self.is_standing_env.nonzero(as_tuple=False).flatten()
         self.dir_command_b[standing_env_ids, :] = 0.0
 
+        # Skip on resets when `dt=0`
+        if env_ids is not None:
+            return
         self._turn_steps += (self.command[:, 2].abs() > 0.1).float()
         self._episode_steps += 1.0
 
