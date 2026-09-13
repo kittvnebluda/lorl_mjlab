@@ -14,7 +14,7 @@ __all__ = ["TeleopState", "build_teleop_gui", "teleop_state"]
 
 _ROTATE_STEP_DEG = 15.0
 
-_HotkeyKey = Literal["I", ",", "J", "L", "U", "O", "space", "K"]
+_HotkeyKey = Literal["I", ",", "J", "L", "U", "O", "K"]
 
 _TURN_OPTIONS = ("Left", "None", "Right")
 _TURN_VALUES = {"Left": 1.0, "None": 0.0, "Right": -1.0}
@@ -30,15 +30,12 @@ class TeleopState:
     """Commanded heading in the robot's base frame, in [-180, 180]. 0 is straight ahead."""
     turn: float = 0.0
     """Discrete turn command in {-1, 0, +1}."""
-    rest: bool = False
-    """Whether the `rest` command is asserted."""
 
     def zero(self) -> None:
         """Return to a plain standing."""
         self.move = False
         self.heading_deg = 0.0
         self.turn = 0.0
-        self.rest = False
 
 
 teleop_state = TeleopState()
@@ -78,7 +75,6 @@ def build_teleop_gui(
         move = server.gui.add_checkbox("Move", initial_value=False)
         heading = server.gui.add_slider("Heading (deg)", min=-180.0, max=180.0, step=5.0, initial_value=0.0)
         turn = server.gui.add_button_group("Turn", options=list(_TURN_OPTIONS))
-        rest = server.gui.add_checkbox("Rest", initial_value=False)
         stand_btn = server.gui.add_button("Stand", icon=Icon.SQUARE_X)
 
     @enable.on_update
@@ -101,16 +97,10 @@ def build_teleop_gui(
         state.turn = _TURN_VALUES.get(turn.value, 0.0)
         changed()
 
-    @rest.on_update
-    def _(_) -> None:
-        state.rest = rest.value
-        changed()
-
     def stand() -> None:
         move.value = False
         heading.value = 0.0
         turn.value = "None"
-        rest.value = False
 
     @stand_btn.on_click
     def _(_) -> None:
@@ -143,5 +133,4 @@ def build_teleop_gui(
     _command("Teleop: steer right", "L", lambda: _rotate(-_ROTATE_STEP_DEG))
     _command("Teleop: turn left", "U", lambda: _step_turn(1.0))
     _command("Teleop: turn right", "O", lambda: _step_turn(-1.0))
-    _command("Teleop: toggle rest", "space", lambda: setattr(rest, "value", not rest.value))
     _command("Teleop: stand", "K", stand)
