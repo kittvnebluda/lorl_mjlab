@@ -6,7 +6,6 @@ dist/
 wheels/
 *.egg-info
 typings
-uv.lock
 
 # Virtual environments
 .venv
