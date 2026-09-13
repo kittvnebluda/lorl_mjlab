@@ -9,7 +9,6 @@ from mjlab.entity import Entity
 from mjlab.managers.scene_entity_config import SceneEntityCfg
 
 from .direction_command import DirectionCommand
-from .rest_command import RestCommand
 
 if TYPE_CHECKING:
     from mjlab.envs import ManagerBasedRlEnv
@@ -21,8 +20,6 @@ def terrain_levels_dir(
     env: ManagerBasedRlEnv,
     env_ids: torch.Tensor,
     command_name: str,
-    rest_command_name: str | None = None,
-    rest_fraction_threshold: float = 0.25,
     turn_fraction_threshold: float = 0.25,
     asset_cfg: SceneEntityCfg = _DEFAULT_ASSET_CFG,
 ) -> dict[str, torch.Tensor]:
@@ -36,11 +33,8 @@ def terrain_levels_dir(
     - Anything in between -> stay put.
 
     Demotion is skipped for episodes that were not supposed to cover ground -- standing envs, and episodes
-    that spent at least ``rest_fraction_threshold`` / ``turn_fraction_threshold`` of their steps resting or
-    turning. Rest and turn are judged over the whole episode, not by the command's value at reset time.
-
-    ``rest_command_name`` is optional: a task configured without a rest command simply has no rest
-    exemption to apply.
+    that spent at least ``turn_fraction_threshold`` of their steps turning. Turning is judged over the
+    whole episode, not by the command's value at reset time.
     """
     asset: Entity = env.scene[asset_cfg.name]
 
@@ -51,10 +45,6 @@ def terrain_levels_dir(
 
     command_term = cast(DirectionCommand, env.command_manager.get_term(command_name))
     assert command_term is not None
-    rest_term = None
-    if rest_command_name is not None:
-        rest_term = cast(RestCommand, env.command_manager.get_term(rest_command_name))
-        assert rest_term is not None
 
     tile = terrain_generator.size[0]
 
@@ -69,8 +59,6 @@ def terrain_levels_dir(
     move_up = distance > tile * 0.5
     move_down = distance < tile * 0.2
     move_down = move_down & ~is_standing & ~was_turning
-    if rest_term is not None:
-        move_down = move_down & ~(rest_term.rest_fraction[env_ids] >= rest_fraction_threshold)
 
     # The first reset happens before any episode has been played: levels are still the
     # random `max_init_terrain_level` spread and `distance` is ~0 for everyone, so acting on

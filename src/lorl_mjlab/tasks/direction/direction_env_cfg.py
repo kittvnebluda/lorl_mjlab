@@ -31,7 +31,7 @@ from mjlab.viewer import ViewerConfig
 from lorl_mjlab.terrains import ROUGH_TERRAINS_CFG, IcraVariant, icra_start_yaw, icra_terrains_generator_cfg
 
 from . import mdp
-from .mdp import DirectionWithRestCommandCfg, RestCommandCfg
+from .mdp import DirectionCommandCfg
 
 _FOOT_SCAN_PATTERN = RingPatternCfg(
     rings=(
@@ -108,10 +108,6 @@ def make_direction_env_cfg() -> ManagerBasedRlEnvCfg:
             func=mdp.generated_commands,
             params={"command_name": "direction"},
         ),
-        "rest_command": ObservationTermCfg(
-            func=mdp.generated_commands,
-            params={"command_name": "rest"},
-        ),
         "actions": ObservationTermCfg(func=mdp.last_action),
     }
 
@@ -184,14 +180,9 @@ def make_direction_env_cfg() -> ManagerBasedRlEnvCfg:
     ##
 
     commands: dict[str, CommandTermCfg] = {
-        "direction": DirectionWithRestCommandCfg(
+        "direction": DirectionCommandCfg(
             entity_name="robot",
             resampling_time_range=(10.0, 10.0),
-            debug_vis=True,
-        ),
-        "rest": RestCommandCfg(
-            entity_name="robot",
-            resampling_time_range=(4.0, 6.0),
             debug_vis=True,
         ),
     }
@@ -313,7 +304,7 @@ def make_direction_env_cfg() -> ManagerBasedRlEnvCfg:
         "flight_phase_cost": RewardTermCfg(
             func=mdp.flight_phase_cost,
             weight=-0.5,
-            params={"sensor_name": "feet_ground_contact", "rest_command_name": "rest"},
+            params={"sensor_name": "feet_ground_contact"},
         ),
         "dof_torques_l2": RewardTermCfg(func=mdp.joint_torques_l2, weight=-2.0e-5),
         "dof_acc_l2": RewardTermCfg(func=mdp.joint_acc_l2, weight=-2.0e-7),
@@ -327,11 +318,10 @@ def make_direction_env_cfg() -> ManagerBasedRlEnvCfg:
             },
         ),
         "undesired_contacts": RewardTermCfg(
-            func=mdp.gated_collision_cost,
+            func=mdp.self_collision_cost,
             weight=-1.0,
             params={
                 "sensor_name": "thigh_ground_touch",
-                "rest_command_name": "rest",
                 "force_threshold": 1.0,
             },
         ),
@@ -340,19 +330,15 @@ def make_direction_env_cfg() -> ManagerBasedRlEnvCfg:
             weight=-2.0,
             params={
                 "sensor_name": "trunk_ground_touch",
-                "rest_command_name": "rest",
                 "force_threshold": 1.0,
             },
         ),
         "stand_posture": RewardTermCfg(
-            func=mdp.mode_posture,
+            func=mdp.stand_posture,
             weight=0.5,
             params={
-                "mode": "stand",
-                "target": None,  # None -> the entity's default (nominal standing) pose.
                 "std": 0.5,
                 "command_name": "direction",
-                "rest_command_name": "rest",
                 "asset_cfg": SceneEntityCfg("robot", joint_names=(".*",)),
             },
         ),
@@ -361,29 +347,8 @@ def make_direction_env_cfg() -> ManagerBasedRlEnvCfg:
             weight=-2.0,
             params={
                 "command_name": "direction",
-                "rest_command_name": "rest",
                 "target_height": 0.0,  # Set per-robot.
                 "asset_cfg": SceneEntityCfg("robot", site_names=()),  # Set per-robot.
-            },
-        ),
-        "rest_posture": RewardTermCfg(
-            func=mdp.mode_posture,
-            weight=0.5,
-            params={
-                "mode": "rest",
-                "target": {},  # Set per-robot.
-                "std": 0.5,
-                "command_name": "direction",
-                "rest_command_name": "rest",
-                "asset_cfg": SceneEntityCfg("robot", joint_names=(".*",)),
-            },
-        ),
-        "rest_descent_rate": RewardTermCfg(
-            func=mdp.rest_descent_rate,
-            weight=-2.0,
-            params={
-                "rest_command_name": "rest",
-                "max_descent": 0.3,  # m/s of free descent before the penalty engages.
             },
         ),
         "base_soft_landing": RewardTermCfg(
@@ -391,22 +356,13 @@ def make_direction_env_cfg() -> ManagerBasedRlEnvCfg:
             weight=-1.0e-5,
             params={"sensor_name": "trunk_ground_touch"},
         ),
-        "rest_effort_cost": RewardTermCfg(
-            func=mdp.rest_effort_cost,
-            weight=-1.0e-3,
-            params={
-                "rest_command_name": "rest",
-                "asset_cfg": SceneEntityCfg("robot", actuator_names=".*"),
-            },
-        ),
         "action_rate_l2": RewardTermCfg(func=mdp.action_rate_l2, weight=-3.0e-3),
         "feet_slide": RewardTermCfg(
-            func=mdp.feet_slip_gated,
+            func=mdp.feet_slip,
             weight=-0.05,
             params={
                 "sensor_name": "feet_ground_contact",
                 "command_name": "direction",
-                "rest_command_name": "rest",
                 "command_threshold": 0.01,
                 "asset_cfg": SceneEntityCfg("robot", site_names=()),  # Set per-robot.
             },
@@ -433,8 +389,6 @@ def make_direction_env_cfg() -> ManagerBasedRlEnvCfg:
             func=mdp.terrain_levels_dir,
             params={
                 "command_name": "direction",
-                "rest_command_name": "rest",
-                "rest_fraction_threshold": 0.25,
                 "turn_fraction_threshold": 0.25,
             },
         ),

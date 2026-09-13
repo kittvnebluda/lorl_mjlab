@@ -2,17 +2,13 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Literal, cast
+from typing import TYPE_CHECKING
 
 import torch
 from mjlab.entity import Entity
 from mjlab.managers.reward_manager import RewardTermCfg
 from mjlab.managers.scene_entity_config import SceneEntityCfg
 from mjlab.sensor import ContactSensor
-from mjlab.tasks.velocity.mdp.rewards import feet_slip as _feet_slip
-from mjlab.utils.lab_api.string import resolve_matching_names_values
-
-from .rest_command import RestCommand
 
 if TYPE_CHECKING:
     from mjlab.envs import ManagerBasedRlEnv
@@ -20,46 +16,19 @@ if TYPE_CHECKING:
 _DEFAULT_ASSET_CFG = SceneEntityCfg("robot")
 
 
-def _rest_mask(env: ManagerBasedRlEnv, rest_command_name: str | None) -> torch.Tensor | None:
-    """Boolean rest mask, or ``None`` when the task is configured without a rest command.
-
-    Every ``rest_command_name`` parameter in this module is optional for the same reason:
-    the rest command is a task variant, not a fixture. ``None`` means no env is ever excused,
-    which is the correct behavior for a task that never tells the robot to lie down.
-    """
-    if rest_command_name is None:
-        return None
-    rest = env.command_manager.get_command(rest_command_name)
-    assert rest is not None
-    return rest[:, 0] > 0.5
-
-
 def _command_modes(
     env: ManagerBasedRlEnv,
     command_name: str,
-    rest_command_name: str | None = None,
-) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
-    """Resolve the three mutually exclusive command modes.
+) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+    """Resolve the two mutually exclusive command modes.
 
-    Returns ``(command, is_rest, is_move, is_stand)``. The direction term already zeroes its
-    command while resting (see ``DirectionWithRestCommand``), so ``is_move`` can never be true
-    while resting and the three masks partition the batch. Without a rest command ``is_rest``
-    is all-false and the partition degenerates to move/stand.
+    Returns ``(command, is_move, is_stand)``, which partition the batch: a zero heading with
+    no turn is a stand, anything else is a move.
     """
     command = env.command_manager.get_command(command_name)
     assert command is not None
     is_move = (torch.norm(command[:, :2], dim=1) > 0.1) | (command[:, 2].abs() > 0.1)
-
-    is_rest = _rest_mask(env, rest_command_name)
-    if is_rest is None:
-        is_rest = torch.zeros_like(is_move)
-    return command, is_rest, is_move, ~is_rest & ~is_move
-
-
-def _release_gate(env: ManagerBasedRlEnv, rest_command_name: str) -> torch.Tensor:
-    """Post-rest-release ramp applied to base contact penalties."""
-    term = cast(RestCommand, env.command_manager.get_term(rest_command_name))
-    return term.release_gate
+    return command, is_move, ~is_move
 
 
 def lin_vel_z_l2(env: ManagerBasedRlEnv, asset_cfg: SceneEntityCfg = _DEFAULT_ASSET_CFG) -> torch.Tensor:
@@ -156,15 +125,9 @@ def feet_air_time_progress(
 def undesired_base_contact(
     env: ManagerBasedRlEnv,
     sensor_name: str,
-    rest_command_name: str | None = None,
     force_threshold: float = 1.0,
 ) -> torch.Tensor:
-    """Penalize base/belly contact everywhere except under an active rest command.
-
-    The penalty ramps back in over the rest term's release grace window so the robot is
-    not punished for the time it physically takes to stand back up. Without a rest command
-    configured there is nothing to excuse and nothing to ramp: the penalty is always on.
-    """
+    """Penalize base/belly contact with the ground."""
     sensor: ContactSensor = env.scene[sensor_name]
     data = sensor.data
     if data.force_history is not None:
@@ -174,84 +137,22 @@ def undesired_base_contact(
         assert data.found is not None
         violations = data.found.sum(dim=-1).float()
 
-    is_rest = _rest_mask(env, rest_command_name)
-    active = torch.ones_like(violations) if is_rest is None else (~is_rest).float()
-
-    grounded_while_active = (violations > 0).float() * active
-    env.extras["log"]["Metrics/prone_while_active"] = grounded_while_active.mean()
-
-    if rest_command_name is None:
-        return violations
-    return violations * active * _release_gate(env, rest_command_name)
+    env.extras["log"]["Metrics/prone"] = (violations > 0).float().mean()
+    return violations
 
 
-def flight_phase_cost(
-    env: ManagerBasedRlEnv,
-    sensor_name: str,
-    rest_command_name: str | None = None,
-) -> torch.Tensor:
-    """Penalty (1.0 per step) when all sensor-tracked feet are simultaneously airborne.
-
-    Gated off during REST: a folded robot has its feet tucked clear of the ground.
-    """
+def flight_phase_cost(env: ManagerBasedRlEnv, sensor_name: str) -> torch.Tensor:
+    """Penalty (1.0 per step) when all sensor-tracked feet are simultaneously airborne."""
     sensor: ContactSensor = env.scene[sensor_name]
     assert sensor.data.found is not None
     num_contacts = sensor.data.found.sum(dim=-1)
-    penalty = (num_contacts == 0).float()
-
-    is_rest = _rest_mask(env, rest_command_name)
-    if is_rest is None:
-        return penalty
-    return penalty * (~is_rest).float()
-
-
-def gated_collision_cost(
-    env: ManagerBasedRlEnv,
-    sensor_name: str,
-    rest_command_name: str | None = None,
-    force_threshold: float = 10.0,
-) -> torch.Tensor:
-    """Rest-aware wrapper around the upstream self-collision cost.
-
-    Mirrors ``mjlab.tasks.velocity.mdp.self_collision_cost`` but excuses contacts under
-    an active rest command -- a prone robot necessarily folds its thighs onto the ground.
-    """
-    sensor: ContactSensor = env.scene[sensor_name]
-    data = sensor.data
-    if data.force_history is not None:
-        force_mag = torch.norm(data.force_history, dim=-1)  # [B, N, H]
-        violations = (force_mag > force_threshold).any(dim=1).sum(dim=-1).float()
-    else:
-        assert data.found is not None
-        violations = data.found.sum(dim=-1).float()
-
-    is_rest = _rest_mask(env, rest_command_name)
-    if is_rest is None:
-        return violations
-    return violations * (~is_rest).float()
-
-
-def feet_slip_gated(
-    env: ManagerBasedRlEnv,
-    sensor_name: str,
-    command_name: str,
-    rest_command_name: str | None = None,
-    command_threshold: float = 0.01,
-    asset_cfg: SceneEntityCfg = _DEFAULT_ASSET_CFG,
-) -> torch.Tensor:
-    """Upstream foot-slip cost, silenced while resting."""
-    cost = _feet_slip(env, sensor_name, command_name, command_threshold, asset_cfg)
-    is_rest = _rest_mask(env, rest_command_name)
-    if is_rest is None:
-        return cost
-    return cost * (~is_rest).float()
+    return (num_contacts == 0).float()
 
 
 def stand_height_shortfall(
     env: ManagerBasedRlEnv,
     command_name: str,
     target_height: float,
-    rest_command_name: str | None = None,
     asset_cfg: SceneEntityCfg = _DEFAULT_ASSET_CFG,
 ) -> torch.Tensor:
     """Trunk-height penalty, active only under a zero (STAND) command.
@@ -260,51 +161,13 @@ def stand_height_shortfall(
     terrain-relative for free on the rough terrain generator and needs no extra raycast.
     """
     asset: Entity = env.scene[asset_cfg.name]
-    *_, is_stand = _command_modes(env, command_name, rest_command_name)
+    *_, is_stand = _command_modes(env, command_name)
 
     foot_z = asset.data.site_pos_w[:, asset_cfg.site_ids, 2].mean(dim=1)
     height = asset.data.root_link_pos_w[:, 2] - foot_z
 
     shortfall = torch.clamp(1.0 - height / target_height, min=0.0)
     return torch.square(shortfall) * is_stand.float()
-
-
-def rest_effort_cost(
-    env: ManagerBasedRlEnv,
-    rest_command_name: str,
-    asset_cfg: SceneEntityCfg = _DEFAULT_ASSET_CFG,
-) -> torch.Tensor:
-    """Penalize actuator effort while resting, so REST means slack and not just a shape."""
-    asset: Entity = env.scene[asset_cfg.name]
-    rest = env.command_manager.get_command(rest_command_name)
-    assert rest is not None
-    effort = torch.sum(torch.square(asset.data.actuator_force[:, asset_cfg.actuator_ids]), dim=1)
-    return effort * (rest[:, 0] > 0.5).float()
-
-
-def rest_descent_rate(
-    env: ManagerBasedRlEnv,
-    rest_command_name: str,
-    max_descent: float = 0.3,
-    asset_cfg: SceneEntityCfg = _DEFAULT_ASSET_CFG,
-) -> torch.Tensor:
-    """Penalize downward base velocity in excess of ``max_descent`` while resting.
-
-    One-sided and dead-banded: descending at up to ``max_descent`` m/s is free, so the term
-    does not fight the lie-down motion itself, only the speed of it. Rising costs nothing --
-    standing back up is not what this is about.
-    """
-    asset: Entity = env.scene[asset_cfg.name]
-    rest = env.command_manager.get_command(rest_command_name)
-    assert rest is not None
-    is_rest = rest[:, 0] > 0.5
-
-    descent = torch.clamp(-asset.data.root_link_lin_vel_w[:, 2] - max_descent, min=0.0)
-
-    rest_num = is_rest.float().sum().clamp(min=1.0)
-    env.extras["log"]["Metrics/rest_descent_rate"] = (descent * is_rest.float()).sum() / rest_num
-
-    return torch.square(descent) * is_rest.float()
 
 
 class radial_progress:
@@ -367,53 +230,30 @@ class radial_progress:
         return gained / env.step_dt
 
 
-class mode_posture:
-    """Joint-posture reward against a per-mode target pose.
+class stand_posture:
+    """Joint-posture reward against the entity's nominal standing pose, active under a
+    zero (STAND) command.
 
-    Implemented as a class so the target pose (a name -> angle mapping) is resolved into
-    a tensor once at construction rather than on every step.
-
-    ``target=None`` means the entity's own default joint positions, i.e. the nominal
-    standing pose. ``mode`` selects which command mode the term is active in.
+    Implemented as a class so the target pose is captured once at construction rather than
+    re-read on every step.
     """
 
     def __init__(self, cfg: RewardTermCfg, env: ManagerBasedRlEnv):
         asset: Entity = env.scene[cfg.params["asset_cfg"].name]
         default_joint_pos = asset.data.default_joint_pos
         assert default_joint_pos is not None
-
-        target = cfg.params["target"]
-        if cfg.params["mode"] == "rest" and not target:
-            raise ValueError(
-                "mode_posture(mode='rest') needs an explicit `target` pose. The base task "
-                "config leaves it empty on purpose -- set it per-robot."
-            )
-        if target is None:
-            self.target_joint_pos = default_joint_pos.clone()
-        else:
-            joint_ids, _, values = resolve_matching_names_values(
-                data=target,
-                list_of_strings=list(asset.joint_names),
-            )
-            self.target_joint_pos = default_joint_pos.clone()
-            self.target_joint_pos[:, joint_ids] = torch.tensor(values, device=env.device, dtype=torch.float32)
+        self.target_joint_pos = default_joint_pos.clone()
 
     def __call__(
         self,
         env: ManagerBasedRlEnv,
-        mode: Literal["stand", "rest"],
-        target: dict[str, float] | None,
         std: float,
         command_name: str,
         asset_cfg: SceneEntityCfg,
-        rest_command_name: str | None = None,
     ) -> torch.Tensor:
-        del target  # Resolved in __init__
         asset: Entity = env.scene[asset_cfg.name]
-        _, is_rest, _, is_stand = _command_modes(env, command_name, rest_command_name)
+        *_, is_stand = _command_modes(env, command_name)
 
         error = asset.data.joint_pos[:, asset_cfg.joint_ids] - self.target_joint_pos[:, asset_cfg.joint_ids]
         reward = torch.exp(-torch.mean(torch.square(error / std), dim=1))
-
-        active = {"stand": is_stand, "rest": is_rest}.get(mode, is_stand)
-        return reward * active.float()
+        return reward * is_stand.float()

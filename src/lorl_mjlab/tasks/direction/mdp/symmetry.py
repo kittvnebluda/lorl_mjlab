@@ -129,7 +129,6 @@ def _transform_group(env: ManagerBasedRlEnv, group: str, obs: torch.Tensor) -> t
         "base_lin_vel": lambda x: _vec_sign(x, [1.0, -1.0, 1.0]),
         "projected_gravity": lambda x: _vec_sign(x, [1.0, -1.0, 1.0]),
         "command": lambda x: _vec_sign(x, [1.0, -1.0, -1.0]),
-        "rest_command": lambda x: x.clone(),
         "forces": lambda x: _vec_sign(x, [1.0, -1.0, 1.0]),
         "torques": lambda x: _vec_sign(x, [-1.0, 1.0, -1.0]),
         "actuator_gains": lambda x: _t_gains(env, x),

@@ -8,7 +8,6 @@ from mjlab.sensor import ContactMatch, ContactSensorCfg, ObjRef, RayCastSensorCf
 
 from lorl_mjlab.robots import (
     ALIENGO_ACTION_SCALE,
-    ALIENGO_REST_JOINT_POS,
     ALIENGO_STAND_HEIGHT_TARGET,
     get_aliengo_robot_cfg,
 )
@@ -104,7 +103,6 @@ def unitree_aliengo_direction_env_cfg(
     cfg.rewards["feet_slide"].params["asset_cfg"].site_names = FOOT_NAMES
     cfg.rewards["stand_height_shortfall"].params["asset_cfg"].site_names = FOOT_NAMES
     cfg.rewards["stand_height_shortfall"].params["target_height"] = ALIENGO_STAND_HEIGHT_TARGET
-    cfg.rewards["rest_posture"].params["target"] = ALIENGO_REST_JOINT_POS
 
     # Apply play mode overrides.
     if play:

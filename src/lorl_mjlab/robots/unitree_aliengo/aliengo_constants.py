@@ -45,13 +45,6 @@ INIT_STATE = EntityCfg.InitialStateCfg(
     joint_vel={".*": 0.0},
 )
 
-# Folded belly-down pose
-ALIENGO_REST_JOINT_POS: dict[str, float] = {
-    ".*_hip_joint": 0.0,
-    ".*_thigh_joint": 1.5,
-    ".*_calf_joint": -2.6,
-}
-
 # Trunk height above the mean foot height that a standing robot must not sag below.
 # Set at ~0.75x the nominal standing height (INIT_STATE z is 0.5)
 ALIENGO_STAND_HEIGHT_TARGET: float = 0.36

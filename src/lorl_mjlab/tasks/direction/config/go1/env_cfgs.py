@@ -19,13 +19,6 @@ from ...direction_env_cfg import apply_icra_course, make_direction_env_cfg
 FOOT_NAMES = ("FR", "FL", "RR", "RL")
 _SCAN_KEY_TO_SITE = {"fl": "FL", "fr": "FR", "rl": "RL", "rr": "RR"}
 
-# Folded belly-down pose targeted by the `rest` command
-REST_JOINT_POS: dict[str, float] = {
-    ".*_hip_joint": 0.0,
-    ".*_thigh_joint": 1.6,
-    ".*_calf_joint": -2.65,
-}
-
 # Trunk height above the mean foot height that a standing robot must not sag below.
 STAND_HEIGHT_TARGET: float = 0.20
 
@@ -141,7 +134,6 @@ def unitree_go1_direction_env_cfg(
     cfg.rewards["feet_slide"].params["asset_cfg"].site_names = FOOT_NAMES
     cfg.rewards["stand_height_shortfall"].params["asset_cfg"].site_names = FOOT_NAMES
     cfg.rewards["stand_height_shortfall"].params["target_height"] = STAND_HEIGHT_TARGET
-    cfg.rewards["rest_posture"].params["target"] = REST_JOINT_POS
 
     # Apply play mode overrides.
     if play:

@@ -107,9 +107,6 @@ class DirectionCommand(CommandTerm):
         vel_norm = torch.norm(vel_xy_b, dim=-1, keepdim=True)
         vel_dir_b = torch.where(vel_norm > 1e-5, vel_xy_b / vel_norm, torch.zeros_like(vel_xy_b))
 
-        # Read through ``command``, not ``dir_command_b``: a subclass that masks the command
-        # (see ``DirectionWithRestCommand``) must not accrue error against a heading the robot
-        # was told to ignore.
         cmd = self.command
         cmd_dir = cmd[:, :2]
 
@@ -210,25 +207,6 @@ class DirectionCommand(CommandTerm):
                 visualizer.add_arrow(origin, turn_end, color=(0.9, 0.6, 0.0, 0.8), width=0.02)
 
 
-class DirectionWithRestCommand(DirectionCommand):
-    """Direction command that goes silent wherever a rest command is active.
-
-    ``dir_command_b`` keeps the raw sampled heading, so the command survives a rest episode
-    and comes back unchanged on release instead of waiting for the next resample.
-    """
-
-    def __init__(self, cfg: DirectionWithRestCommandCfg, env: ManagerBasedRlEnv):
-        super().__init__(cfg, env)
-        self._rest_command_name = cfg.rest_command_name
-
-    @property
-    def command(self) -> torch.Tensor:
-        """The direction command, zeroed while resting. Shape is (num_envs, 3)."""
-        rest = self._env.command_manager.get_command(self._rest_command_name)
-        assert rest is not None
-        return self.dir_command_b * (1.0 - rest)
-
-
 @dataclass(kw_only=True)
 class DirectionCommandCfg(CommandTermCfg):
     entity_name: str
@@ -256,12 +234,3 @@ class DirectionCommandCfg(CommandTermCfg):
 
     def build(self, env: ManagerBasedRlEnv) -> DirectionCommand:
         return DirectionCommand(self, env)
-
-
-@dataclass(kw_only=True)
-class DirectionWithRestCommandCfg(DirectionCommandCfg):
-    rest_command_name: str = "rest"
-    """Name of the rest command term whose active envs zero this command."""
-
-    def build(self, env: ManagerBasedRlEnv) -> DirectionWithRestCommand:
-        return DirectionWithRestCommand(self, env)

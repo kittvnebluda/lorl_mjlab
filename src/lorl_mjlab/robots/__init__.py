@@ -1,5 +1,4 @@
 from lorl_mjlab.robots.unitree_aliengo.aliengo_constants import ALIENGO_ACTION_SCALE as ALIENGO_ACTION_SCALE
-from lorl_mjlab.robots.unitree_aliengo.aliengo_constants import ALIENGO_REST_JOINT_POS as ALIENGO_REST_JOINT_POS
 from lorl_mjlab.robots.unitree_aliengo.aliengo_constants import (
     ALIENGO_STAND_HEIGHT_TARGET as ALIENGO_STAND_HEIGHT_TARGET,
 )
