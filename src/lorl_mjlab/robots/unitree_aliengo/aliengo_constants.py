@@ -45,10 +45,10 @@ INIT_STATE = EntityCfg.InitialStateCfg(
     joint_vel={".*": 0.0},
 )
 
-# Trunk height above the mean foot height that a standing robot must not sag below.
-# ~0.75x the nominal standing height, which is 0.349 m.
+# Trunk height above the ray cast terrain height that a standing robot must not sag below.
+# ~0.75x the nominal standing height, which is 0.349 m, plus the 0.0265 m foot sphere radius
 # Not to be confused with INIT_STATE's own z (0.5)
-ALIENGO_STAND_HEIGHT_TARGET: float = 0.26
+ALIENGO_STAND_HEIGHT_TARGET: float = 0.2865
 
 ##
 # Collision config.

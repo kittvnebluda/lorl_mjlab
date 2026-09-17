@@ -9,7 +9,7 @@ from mjlab.envs.mdp import dr
 from mjlab.envs.mdp.actions import JointPositionActionCfg
 from mjlab.managers.event_manager import EventTermCfg
 from mjlab.managers.scene_entity_config import SceneEntityCfg
-from mjlab.sensor import ContactMatch, ContactSensorCfg, ObjRef, RayCastSensorCfg
+from mjlab.sensor import ContactMatch, ContactSensorCfg, ObjRef, RayCastSensorCfg, TerrainHeightSensorCfg
 
 from lorl_mjlab.robots import GO1_LEARNED_ACTION_SCALE, GO1_LEARNED_ACTUATOR_CFGS
 from lorl_mjlab.terrains import IcraVariant
@@ -19,8 +19,8 @@ from ...direction_env_cfg import apply_icra_course, make_direction_env_cfg
 FOOT_NAMES = ("FR", "FL", "RR", "RL")
 _SCAN_KEY_TO_SITE = {"fl": "FL", "fr": "FR", "rl": "RL", "rr": "RR"}
 
-# Trunk height above the mean foot height that a standing robot must not sag below.
-STAND_HEIGHT_TARGET: float = 0.20
+# Trunk height above the ray cast terrain height that a standing robot must not sag below.
+STAND_HEIGHT_TARGET: float = 0.223
 
 
 def unitree_go1_direction_env_cfg(
@@ -53,9 +53,12 @@ def unitree_go1_direction_env_cfg(
     cfg.scene.entities = {"robot": robot_cfg}
     cfg.scene.num_envs = 4096
 
-    # Wire foot scan sensors to per-foot sites.
+    # Wire the ray cast scanners to their per-robot frames.
     for sensor in cfg.scene.sensors or ():
-        if isinstance(sensor, RayCastSensorCfg) and sensor.name.endswith("_foot_scan"):
+        if isinstance(sensor, TerrainHeightSensorCfg) and sensor.name == "trunk_height_scan":
+            assert isinstance(sensor.frame, ObjRef)
+            sensor.frame.name = "trunk"
+        elif isinstance(sensor, RayCastSensorCfg) and sensor.name.endswith("_foot_scan"):
             key = sensor.name.removesuffix("_foot_scan")
             assert isinstance(sensor.frame, ObjRef)
             sensor.frame.name = _SCAN_KEY_TO_SITE[key]
@@ -131,7 +134,6 @@ def unitree_go1_direction_env_cfg(
     cfg.observations["privileged"].terms["torques"].params["asset_cfg"].body_names = ("trunk",)
 
     cfg.rewards["feet_slide"].params["asset_cfg"].site_names = FOOT_NAMES
-    cfg.rewards["stand_height_shortfall"].params["asset_cfg"].site_names = FOOT_NAMES
     cfg.rewards["stand_height_shortfall"].params["target_height"] = STAND_HEIGHT_TARGET
 
     # Apply play mode overrides.

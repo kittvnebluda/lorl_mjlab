@@ -22,7 +22,7 @@ from mjlab.managers.reward_manager import RewardTermCfg
 from mjlab.managers.scene_entity_config import SceneEntityCfg
 from mjlab.managers.termination_manager import TerminationTermCfg
 from mjlab.scene import SceneCfg
-from mjlab.sensor import ObjRef, RayCastSensorCfg, RingPatternCfg
+from mjlab.sensor import ObjRef, RayCastSensorCfg, RingPatternCfg, TerrainHeightSensorCfg
 from mjlab.sim import MujocoCfg, SimulationCfg
 from mjlab.terrains import TerrainEntityCfg
 from mjlab.utils.noise import UniformNoiseCfg as Unoise
@@ -69,6 +69,26 @@ def _foot_scanner(foot: str) -> RayCastSensorCfg:
         max_distance=1.0,
         exclude_parent_body=True,
         include_geom_groups=(0,),  # Terrain only.
+        debug_vis=False,
+    )
+
+
+def _trunk_height_scanner() -> TerrainHeightSensorCfg:
+    """Single downward ray under the trunk, for terrain-relative body height.
+
+    One ray suffices because ``stand_height_shortfall`` is STAND-gated and one-sided: a
+    1500-iteration seed=1 ablation against a 37-ray reference left the converged penalty
+    at zero for 1, 5 and 17 rays.
+    """
+    return TerrainHeightSensorCfg(
+        name="trunk_height_scan",
+        frame=ObjRef(type="body", name="", entity="robot"),  # Set per-robot.
+        ray_alignment="yaw",
+        pattern=RingPatternCfg(rings=(), include_center=True),
+        max_distance=2.0,
+        exclude_parent_body=True,
+        include_geom_groups=(0,),  # Terrain only.
+        reduction="mean",
         debug_vis=False,
     )
 
@@ -339,7 +359,7 @@ def make_direction_env_cfg() -> ManagerBasedRlEnvCfg:
             params={
                 "command_name": "direction",
                 "target_height": 0.0,  # Set per-robot.
-                "asset_cfg": SceneEntityCfg("robot", site_names=()),  # Set per-robot.
+                "sensor_name": "trunk_height_scan",
             },
         ),
         "action_rate_l2": RewardTermCfg(func=mdp.action_rate_l2, weight=-3.0e-3),
@@ -391,7 +411,7 @@ def make_direction_env_cfg() -> ManagerBasedRlEnvCfg:
                 terrain_generator=replace(ROUGH_TERRAINS_CFG),
                 max_init_terrain_level=5,
             ),
-            sensors=foot_scanners,
+            sensors=foot_scanners + (_trunk_height_scanner(),),
             extent=2.0,
         ),
         observations=observations,

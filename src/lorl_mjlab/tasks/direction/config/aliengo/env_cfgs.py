@@ -4,7 +4,7 @@ from mjlab.envs import ManagerBasedRlEnvCfg
 from mjlab.envs import mdp as envs_mdp
 from mjlab.envs.mdp.actions import JointPositionActionCfg
 from mjlab.managers.event_manager import EventTermCfg
-from mjlab.sensor import ContactMatch, ContactSensorCfg, ObjRef, RayCastSensorCfg
+from mjlab.sensor import ContactMatch, ContactSensorCfg, ObjRef, RayCastSensorCfg, TerrainHeightSensorCfg
 
 from lorl_mjlab.robots import (
     ALIENGO_ACTION_SCALE,
@@ -36,9 +36,12 @@ def unitree_aliengo_direction_env_cfg(
     cfg.scene.entities = {"robot": get_aliengo_robot_cfg()}
     cfg.scene.num_envs = 4096
 
-    # Wire foot scan sensors to per-foot sites.
+    # Wire the ray cast scanners to their per-robot frames.
     for sensor in cfg.scene.sensors or ():
-        if isinstance(sensor, RayCastSensorCfg) and sensor.name.endswith("_foot_scan"):
+        if isinstance(sensor, TerrainHeightSensorCfg) and sensor.name == "trunk_height_scan":
+            assert isinstance(sensor.frame, ObjRef)
+            sensor.frame.name = "trunk"
+        elif isinstance(sensor, RayCastSensorCfg) and sensor.name.endswith("_foot_scan"):
             key = sensor.name.removesuffix("_foot_scan")
             assert isinstance(sensor.frame, ObjRef)
             sensor.frame.name = _SCAN_KEY_TO_SITE[key]
@@ -100,7 +103,6 @@ def unitree_aliengo_direction_env_cfg(
     cfg.observations["privileged"].terms["torques"].params["asset_cfg"].body_names = ("trunk",)
 
     cfg.rewards["feet_slide"].params["asset_cfg"].site_names = FOOT_NAMES
-    cfg.rewards["stand_height_shortfall"].params["asset_cfg"].site_names = FOOT_NAMES
     cfg.rewards["stand_height_shortfall"].params["target_height"] = ALIENGO_STAND_HEIGHT_TARGET
 
     # Apply play mode overrides.

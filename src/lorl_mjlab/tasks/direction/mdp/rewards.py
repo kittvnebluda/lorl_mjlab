@@ -8,7 +8,7 @@ import torch
 from mjlab.entity import Entity
 from mjlab.managers.reward_manager import RewardTermCfg
 from mjlab.managers.scene_entity_config import SceneEntityCfg
-from mjlab.sensor import ContactSensor
+from mjlab.sensor import ContactSensor, TerrainHeightSensor
 
 if TYPE_CHECKING:
     from mjlab.envs import ManagerBasedRlEnv
@@ -153,18 +153,16 @@ def stand_height_shortfall(
     env: ManagerBasedRlEnv,
     command_name: str,
     target_height: float,
-    asset_cfg: SceneEntityCfg = _DEFAULT_ASSET_CFG,
+    sensor_name: str,
 ) -> torch.Tensor:
     """Trunk-height penalty, active only under a zero (STAND) command.
 
-    Height is measured as trunk-above-mean-foot rather than world z, which makes it
-    terrain-relative for free on the rough terrain generator and needs no extra raycast.
+    Height is the ray-cast clearance from the trunk down to the terrain.
     """
-    asset: Entity = env.scene[asset_cfg.name]
+    sensor: TerrainHeightSensor = env.scene[sensor_name]
     *_, is_stand = _command_modes(env, command_name)
 
-    foot_z = asset.data.site_pos_w[:, asset_cfg.site_ids, 2].mean(dim=1)
-    height = asset.data.root_link_pos_w[:, 2] - foot_z
+    height = sensor.data.heights[:, 0]
 
     shortfall = torch.clamp(1.0 - height / target_height, min=0.0)
     return torch.square(shortfall) * is_stand.float()
