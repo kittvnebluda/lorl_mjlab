@@ -117,9 +117,28 @@ for a in ALIENGO_ARTICULATION.actuators:
 
 
 if __name__ == "__main__":
+    from contextlib import suppress
+
+    import numpy as np
     from mjlab.entity.entity import Entity
     from mujoco import viewer
 
     robot = Entity(get_aliengo_robot_cfg())
+    m: mujoco.MjModel = robot.spec.compile()
+    d: mujoco.MjData = mujoco.MjData(m)
 
-    viewer.launch(robot.spec.compile())
+    with suppress(KeyboardInterrupt), viewer.launch_passive(m, d) as v:
+        while v.is_running():
+            scn = v.user_scn
+            assert scn is not None
+            # debugging sphere
+            mujoco.mjv_initGeom(
+                scn.geoms[0],
+                mujoco.mjtGeom.mjGEOM_SPHERE,
+                size=np.array([0.01, 0, 0]),
+                pos=np.array([0.2407, -0.051, 0.5265]),
+                mat=np.eye(3).flatten(),
+                rgba=np.array([1, 0, 0, 1]),
+            )
+            scn.ngeom += 1
+            v.sync()
