@@ -1,5 +1,3 @@
-"""Terrain curriculum for the direction command family."""
-
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, cast

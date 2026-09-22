@@ -10,25 +10,12 @@ from mjlab.managers.reward_manager import RewardTermCfg
 from mjlab.managers.scene_entity_config import SceneEntityCfg
 from mjlab.sensor import ContactSensor, TerrainHeightSensor
 
+from lorl_mjlab.envs.mdp.rewards import command_modes
+
 if TYPE_CHECKING:
     from mjlab.envs import ManagerBasedRlEnv
 
 _DEFAULT_ASSET_CFG = SceneEntityCfg("robot")
-
-
-def _command_modes(
-    env: ManagerBasedRlEnv,
-    command_name: str,
-) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
-    """Resolve the two mutually exclusive command modes.
-
-    Returns ``(command, is_move, is_stand)``, which partition the batch: a zero heading with
-    no turn is a stand, anything else is a move.
-    """
-    command = env.command_manager.get_command(command_name)
-    assert command is not None
-    is_move = (torch.norm(command[:, :2], dim=1) > 0.1) | (command[:, 2].abs() > 0.1)
-    return command, is_move, ~is_move
 
 
 def lin_vel_z_l2(env: ManagerBasedRlEnv, asset_cfg: SceneEntityCfg = _DEFAULT_ASSET_CFG) -> torch.Tensor:
@@ -53,26 +40,6 @@ def track_direction(
 
     rew = torch.clamp(v_pr, min=0.0, max=0.6) / 0.6
     return torch.where(is_standing_cmd, torch.zeros_like(rew), rew)
-
-
-def track_turn(
-    env: ManagerBasedRlEnv,
-    command_name: str,
-    asset_cfg: SceneEntityCfg = _DEFAULT_ASSET_CFG,
-) -> torch.Tensor:
-    """Turn-tracking reward that also penalizes yaw spin when no turn is commanded."""
-    asset: Entity = env.scene[asset_cfg.name]
-    command = env.command_manager.get_command(command_name)
-    assert command is not None
-    cmd_turn = command[:, 2]
-    vel_yaw_b = asset.data.root_link_ang_vel_b[:, 2]
-
-    no_turn = cmd_turn.abs() < 0.1
-    w_pr = cmd_turn * vel_yaw_b
-    turn_rew = torch.where(w_pr >= 0.6, torch.ones_like(w_pr), torch.exp(-1.5 * torch.square(w_pr - 0.6)))
-    still_rew = torch.exp(-1.5 * torch.square(vel_yaw_b))
-
-    return torch.where(no_turn, still_rew, turn_rew)
 
 
 def base_motion_reward(
@@ -160,7 +127,7 @@ def stand_height_shortfall(
     Height is the ray-cast clearance from the trunk down to the terrain.
     """
     sensor: TerrainHeightSensor = env.scene[sensor_name]
-    *_, is_stand = _command_modes(env, command_name)
+    *_, is_stand = command_modes(env, command_name)
 
     height = sensor.data.heights[:, 0]
 
@@ -254,7 +221,7 @@ class stand_posture:
         asset_cfg: SceneEntityCfg,
     ) -> torch.Tensor:
         asset: Entity = env.scene[asset_cfg.name]
-        *_, is_stand = _command_modes(env, command_name)
+        *_, is_stand = command_modes(env, command_name)
 
         error = asset.data.joint_pos[:, asset_cfg.joint_ids] - self.target_joint_pos[:, asset_cfg.joint_ids]
         reward = torch.exp(-torch.mean(torch.square(error / std), dim=1))

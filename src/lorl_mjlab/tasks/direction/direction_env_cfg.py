@@ -1,39 +1,31 @@
-"""Direction task configuration.
+"""Direction-command task configuration.
 
 This module provides a factory function to create a base direction-command
-locomotion task config (heading + discrete turn, per Lee et al. 2020).
-Robot-specific configurations call the factory and customize as needed --
-mirrors ``mjlab.tasks.velocity.velocity_env_cfg.make_velocity_env_cfg``.
+locomotion task config (heading + discrete turn).
 """
-
-from dataclasses import replace
 
 from mjlab.envs import ManagerBasedRlEnvCfg
 from mjlab.envs import mdp as envs_mdp
-from mjlab.envs.mdp import dr
 from mjlab.envs.mdp.actions import JointPositionActionCfg
 from mjlab.managers.action_manager import ActionTermCfg
 from mjlab.managers.command_manager import CommandTermCfg
 from mjlab.managers.curriculum_manager import CurriculumTermCfg
-from mjlab.managers.event_manager import EventTermCfg
 from mjlab.managers.metrics_manager import MetricsTermCfg
 from mjlab.managers.observation_manager import ObservationGroupCfg, ObservationTermCfg
 from mjlab.managers.reward_manager import RewardTermCfg
 from mjlab.managers.scene_entity_config import SceneEntityCfg
-from mjlab.managers.termination_manager import TerminationTermCfg
-from mjlab.scene import SceneCfg
-from mjlab.sensor import ObjRef, RayCastSensorCfg, RingPatternCfg, TerrainHeightSensorCfg
-from mjlab.sim import MujocoCfg, SimulationCfg
-from mjlab.terrains import TerrainEntityCfg
-from mjlab.utils.noise import UniformNoiseCfg as Unoise
+from mjlab.sensor import RingPatternCfg
 from mjlab.viewer import ViewerConfig
 
-from lorl_mjlab.terrains import ROUGH_TERRAINS_CFG, IcraVariant, icra_start_yaw, icra_terrains_generator_cfg
+from lorl_mjlab.envs.events import my_events
+from lorl_mjlab.envs.mdp.observations import base_policy_obs_terms, base_privileged_obs_terms
+from lorl_mjlab.envs.scene import FOOT_SCAN_KEYS, make_scene_cfg, make_sim_cfg
+from lorl_mjlab.envs.terminations import base_terminations
 
 from . import mdp
 from .mdp import DirectionCommandCfg
 
-_FOOT_SCAN_PATTERN = RingPatternCfg(
+FOOT_SCAN_PATTERN = RingPatternCfg(
     rings=(
         RingPatternCfg.Ring(radius=0.08, num_samples=6),
         RingPatternCfg.Ring(radius=0.16, num_samples=12),
@@ -42,124 +34,16 @@ _FOOT_SCAN_PATTERN = RingPatternCfg(
     include_center=False,
 )
 
-_FOOT_NAMES = ("fl", "fr", "rl", "rr")
-
-
-def apply_icra_course(cfg: ManagerBasedRlEnvCfg, variant: IcraVariant) -> None:
-    """Swap the procedural terrain for the fixed ICRA2024 QRC course."""
-    assert cfg.scene.terrain is not None
-    cfg.scene.terrain.terrain_generator = icra_terrains_generator_cfg(variant)
-    cfg.scene.num_envs = 1
-
-    cfg.terminations = {}
-
-    cfg.events.pop("randomize_terrain", None)
-
-    yaw = icra_start_yaw(variant)
-    cfg.events["reset_base"].params["pose_range"] = {"yaw": (yaw, yaw)}
-
-
-def _foot_scanner(foot: str) -> RayCastSensorCfg:
-    """One downward concentric-ring height scanner attached to a single foot site."""
-    return RayCastSensorCfg(
-        name=f"{foot}_foot_scan",
-        frame=ObjRef(type="site", name="", entity="robot"),  # Set per-robot.
-        ray_alignment="yaw",
-        pattern=_FOOT_SCAN_PATTERN,
-        max_distance=1.0,
-        exclude_parent_body=True,
-        include_geom_groups=(0,),  # Terrain only.
-        debug_vis=False,
-    )
-
-
-def _trunk_height_scanner() -> TerrainHeightSensorCfg:
-    """Single downward ray under the trunk, for terrain-relative body height.
-
-    One ray suffices because ``stand_height_shortfall`` is STAND-gated and one-sided: a
-    1500-iteration seed=1 ablation against a 37-ray reference left the converged penalty
-    at zero for 1, 5 and 17 rays.
-    """
-    return TerrainHeightSensorCfg(
-        name="trunk_height_scan",
-        frame=ObjRef(type="body", name="", entity="robot"),  # Set per-robot.
-        ray_alignment="yaw",
-        pattern=RingPatternCfg(rings=(), include_center=True),
-        max_distance=2.0,
-        exclude_parent_body=True,
-        include_geom_groups=(0,),  # Terrain only.
-        reduction="mean",
-        debug_vis=False,
-    )
-
 
 def make_direction_env_cfg() -> ManagerBasedRlEnvCfg:
     """Create base direction-command task configuration."""
 
     ##
-    # Sensors
-    ##
-
-    foot_scanners = tuple(_foot_scanner(foot) for foot in _FOOT_NAMES)
-
-    ##
     # Observations
     ##
 
-    policy_terms = {
-        "joint_pos": ObservationTermCfg(
-            func=mdp.joint_pos_rel,
-            noise=Unoise(n_min=-0.01, n_max=0.01),
-        ),
-        "base_ang_vel": ObservationTermCfg(
-            func=mdp.builtin_sensor,
-            params={"sensor_name": "robot/imu_ang_vel"},
-            noise=Unoise(n_min=-0.2, n_max=0.2),
-        ),
-        "joint_vel": ObservationTermCfg(
-            func=mdp.joint_vel_rel,
-            noise=Unoise(n_min=-1.5, n_max=1.5),
-        ),
-        "projected_gravity": ObservationTermCfg(
-            func=mdp.projected_gravity,
-            noise=Unoise(n_min=-0.05, n_max=0.05),
-        ),
-        "command": ObservationTermCfg(
-            func=mdp.generated_commands,
-            params={"command_name": "direction"},
-        ),
-        "actions": ObservationTermCfg(func=mdp.last_action),
-    }
-
-    privileged_terms = {
-        "base_lin_vel": ObservationTermCfg(
-            func=mdp.builtin_sensor,
-            params={"sensor_name": "robot/imu_lin_vel"},
-            noise=Unoise(n_min=-0.1, n_max=0.1),
-        ),
-        "foot_contacts": ObservationTermCfg(
-            func=mdp.foot_contact,
-            params={"sensor_name": "feet_ground_contact"},
-        ),
-        **{
-            f"{foot}_foot_scan": ObservationTermCfg(
-                func=envs_mdp.height_scan,
-                params={"sensor_name": f"{foot}_foot_scan"},
-                noise=Unoise(n_min=-0.1, n_max=0.1),
-                clip=(-1.0, 1.0),
-            )
-            for foot in _FOOT_NAMES
-        },
-        "actuator_gains": ObservationTermCfg(func=mdp.actuator_gains),
-        "forces": ObservationTermCfg(
-            func=mdp.external_force_b,
-            params={"asset_cfg": SceneEntityCfg("robot", body_names=())},  # Set per-robot.
-        ),
-        "torques": ObservationTermCfg(
-            func=mdp.external_torque_b,
-            params={"asset_cfg": SceneEntityCfg("robot", body_names=())},  # Set per-robot.
-        ),
-    }
+    policy_terms = base_policy_obs_terms(command_name="direction")
+    policy_terms["actions"] = ObservationTermCfg(func=envs_mdp.last_action)
 
     observations = {
         "policy": ObservationGroupCfg(
@@ -168,18 +52,10 @@ def make_direction_env_cfg() -> ManagerBasedRlEnvCfg:
             enable_corruption=False,  # Teacher trains on clean proprio; distill flips this on.
         ),
         "privileged": ObservationGroupCfg(
-            terms=privileged_terms,
+            terms=base_privileged_obs_terms(foot_scan_keys=FOOT_SCAN_KEYS),
             concatenate_terms=True,
             enable_corruption=False,
         ),
-    }
-
-    ##
-    # Metrics
-    ##
-
-    metrics = {
-        "mean_action_acc": MetricsTermCfg(func=mdp.mean_action_acc),
     }
 
     ##
@@ -204,97 +80,6 @@ def make_direction_env_cfg() -> ManagerBasedRlEnvCfg:
             entity_name="robot",
             resampling_time_range=(10.0, 10.0),
             debug_vis=True,
-        ),
-    }
-
-    ##
-    # Events
-    ##
-
-    events = {
-        "reset_base": EventTermCfg(
-            func=mdp.reset_root_state_uniform,
-            mode="reset",
-            params={
-                "pose_range": {"x": (-0.5, 0.5), "y": (-0.5, 0.5), "yaw": (-3.14, 3.14)},
-                "velocity_range": {},
-            },
-        ),
-        "reset_robot_joints": EventTermCfg(
-            func=mdp.reset_joints_by_offset,
-            mode="reset",
-            params={
-                "position_range": (0.0, 0.0),
-                "velocity_range": (0.0, 0.0),
-                "asset_cfg": SceneEntityCfg("robot", joint_names=(".*",)),
-            },
-        ),
-        "push_robot": EventTermCfg(
-            func=mdp.push_by_setting_velocity,
-            mode="interval",
-            interval_range_s=(10.0, 15.0),
-            params={"velocity_range": {"x": (-0.5, 0.5), "y": (-0.5, 0.5)}},
-        ),
-        "base_external_force_torque": EventTermCfg(
-            func=mdp.apply_external_force_torque,
-            mode="reset",
-            params={
-                "asset_cfg": SceneEntityCfg("robot", body_names=()),  # Set per-robot.
-                "force_range": (0.0, 0.0),  # Set per-robot.
-                "torque_range": (0.0, 0.0),  # Set per-robot.
-            },
-        ),
-        "foot_friction": EventTermCfg(
-            mode="startup",
-            func=dr.geom_friction,
-            params={
-                "asset_cfg": SceneEntityCfg("robot", geom_names=()),  # Set per-robot.
-                "operation": "abs",
-                "ranges": (0.6, 1.5),
-                "shared_random": True,
-            },
-        ),
-        "base_inertial": EventTermCfg(
-            mode="startup",
-            func=dr.pseudo_inertia,
-            params={
-                "asset_cfg": SceneEntityCfg("robot", body_names=()),  # Set per-robot.
-                "alpha_range": (-0.3466, 0.2027),
-                "t1_range": (-0.1, 0.1),
-                "t2_range": (-0.1, 0.1),
-                "t3_range": (-0.1, 0.1),
-            },
-        ),
-        "actuator_gains": EventTermCfg(
-            mode="startup",
-            func=dr.pd_gains,
-            params={
-                "asset_cfg": SceneEntityCfg("robot", actuator_names=".*"),
-                "kp_range": (0.7, 1.3),
-                "kd_range": (0.7, 1.3),
-                "operation": "scale",
-                "distribution": "uniform",
-            },
-        ),
-        "joint_friction": EventTermCfg(
-            mode="startup",
-            func=dr.joint_friction,
-            params={
-                "asset_cfg": SceneEntityCfg("robot", joint_names=(".*",)),
-                "ranges": (0.0, 0.4),
-                "operation": "abs",
-                "distribution": "uniform",
-            },
-        ),
-        "joint_armature": EventTermCfg(
-            mode="startup",
-            func=dr.joint_armature,
-            params={
-                "asset_cfg": SceneEntityCfg("robot", joint_names=(".*",)),
-                "ranges": (0.0, 0.05),
-                "operation": "abs",
-                "distribution": "uniform",
-            },
         ),
     }
 
@@ -377,16 +162,6 @@ def make_direction_env_cfg() -> ManagerBasedRlEnvCfg:
     }
 
     ##
-    # Terminations
-    ##
-
-    terminations = {
-        "time_out": TerminationTermCfg(func=mdp.time_out, time_out=True),
-        "out_of_terrain_bounds": TerminationTermCfg(func=mdp.out_of_terrain_bounds, time_out=True),
-        "flipped": TerminationTermCfg(func=mdp.bad_orientation, time_out=False, params={"limit_angle": 1.4}),
-    }
-
-    ##
     # Curriculum
     ##
 
@@ -405,23 +180,15 @@ def make_direction_env_cfg() -> ManagerBasedRlEnvCfg:
     ##
 
     return ManagerBasedRlEnvCfg(
-        scene=SceneCfg(
-            terrain=TerrainEntityCfg(
-                terrain_type="generator",
-                terrain_generator=replace(ROUGH_TERRAINS_CFG),
-                max_init_terrain_level=5,
-            ),
-            sensors=foot_scanners + (_trunk_height_scanner(),),
-            extent=2.0,
-        ),
+        scene=make_scene_cfg(foot_scan_pattern=FOOT_SCAN_PATTERN),
         observations=observations,
         actions=actions,
         commands=commands,
-        events=events,
+        events=my_events(),
         rewards=rewards,
-        terminations=terminations,
+        terminations=base_terminations(),
         curriculum=curriculum,
-        metrics=metrics,
+        metrics={"mean_action_acc": MetricsTermCfg(func=mdp.mean_action_acc)},
         viewer=ViewerConfig(
             origin_type=ViewerConfig.OriginType.ASSET_BODY,
             entity_name="robot",
@@ -430,14 +197,7 @@ def make_direction_env_cfg() -> ManagerBasedRlEnvCfg:
             elevation=-5.0,
             azimuth=90.0,
         ),
-        sim=SimulationCfg(
-            mujoco=MujocoCfg(
-                timestep=0.005,
-                iterations=10,
-                ls_iterations=20,
-            ),
-            nconmax=35,
-        ),
+        sim=make_sim_cfg(),
         decimation=4,
         episode_length_s=20.0,
     )
