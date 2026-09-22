@@ -95,12 +95,12 @@ def make_direction_env_cfg() -> ManagerBasedRlEnvCfg:
             params={"command_name": "direction"},
         ),
         "track_turn": RewardTermCfg(
-            func=mdp.track_turn,
+            func=mdp.ang_vel_rew_13,
             weight=0.5,
             params={"command_name": "direction"},
         ),
         "base_motion": RewardTermCfg(
-            func=mdp.base_motion_reward,
+            func=mdp.base_motion,
             weight=0.15,
             params={"command_name": "direction"},
         ),

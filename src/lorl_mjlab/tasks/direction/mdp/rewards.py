@@ -42,7 +42,7 @@ def track_direction(
     return torch.where(is_standing_cmd, torch.zeros_like(rew), rew)
 
 
-def base_motion_reward(
+def base_motion(
     env: ManagerBasedRlEnv,
     command_name: str,
     asset_cfg: SceneEntityCfg = _DEFAULT_ASSET_CFG,

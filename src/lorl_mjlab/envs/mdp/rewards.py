@@ -27,12 +27,16 @@ def command_modes(
     return command, is_move, ~is_move
 
 
-def track_turn(
+def ang_vel_rew_13(
     env: ManagerBasedRlEnv,
     command_name: str,
     asset_cfg: SceneEntityCfg = _DEFAULT_ASSET_CFG,
 ) -> torch.Tensor:
-    """Turn-tracking reward that also penalizes yaw spin when no turn is commanded."""
+    """Turn-tracking reward that also penalizes yaw spin when no turn is commanded.
+
+    Lee et al. 2020 eq. 13 verbatim for the turning case; the zero-turn branch is extension,
+    as the paper is not specific on this case
+    """
     asset: Entity = env.scene[asset_cfg.name]
     command = env.command_manager.get_command(command_name)
     assert command is not None
