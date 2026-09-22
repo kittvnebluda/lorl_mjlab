@@ -1,5 +1,7 @@
 # Legged Obstacle RL MJLab
 
+https://github.com/user-attachments/assets/cff375e6-93a3-4bf6-834f-ef4d91442c70
+
 Legged locomotion RL tasks for quadrupeds (Unitree Go1, AlienGo), built on
 [mjlab](https://github.com/mujocolab/mjlab) — a MuJoCo/MJX-based reimplementation
 of Isaac Lab's manager-based RL API.
