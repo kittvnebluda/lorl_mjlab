@@ -73,7 +73,7 @@ def terrain_levels_dir(
         "mean": levels.mean(),
         "max": levels.max(),
         "distance": distance.mean(),
-        "v_pr": command_term.metrics["v_pr"][env_ids].mean(),
+        "v_pr": command_term.metric_mean("v_pr", env_ids),
     }
 
     sub_terrain_names = list(terrain_generator.sub_terrains.keys())

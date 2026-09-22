@@ -20,6 +20,12 @@ if TYPE_CHECKING:
     from mjlab.envs.manager_based_rl_env import ManagerBasedRlEnv
     from mjlab.viewer.debug_visualizer import DebugVisualizer
 
+_CMD_DEADBAND = 0.1
+"""Magnitude below which a heading or turn command counts as absent."""
+
+_TURN_DEADBAND = 0.1
+"""[rad/s]. Yaw rate below which the robot counts as not turning."""
+
 
 class DirectionCommand(CommandTerm):
     """Command generator producing a directional command vector (Lee et al., 2020).
@@ -41,9 +47,13 @@ class DirectionCommand(CommandTerm):
         self.dir_command_b = torch.zeros(self.num_envs, 3, device=self.device)
         self.is_standing_env = torch.zeros(self.num_envs, dtype=torch.bool, device=self.device)
 
+        # Each metric accumulates a per-env sum alongside its own step count,
+        # and `reset` flushes the two as a pooled mean.
         self.metrics["cmd_angle_error"] = torch.zeros(self.num_envs, device=self.device)
         self.metrics["turn_sign_error"] = torch.zeros(self.num_envs, device=self.device)
+        self.metrics["w_pr"] = torch.zeros(self.num_envs, device=self.device)
         self.metrics["v_pr"] = torch.zeros(self.num_envs, device=self.device)
+        self._metric_counts = {n: torch.zeros(self.num_envs, device=self.device) for n in self.metrics}
 
         # Episode fraction spent under a turn command. The curriculum exempts
         # turn-dominated episodes from demotion; see `turn_fraction`.
@@ -61,6 +71,13 @@ class DirectionCommand(CommandTerm):
     def turn_fraction(self) -> torch.Tensor:
         """Fraction of the current episode spent under a turn command. Shape (num_envs,)."""
         return self._turn_steps / self._episode_steps.clamp(min=1.0)
+
+    def metric_mean(self, name: str, env_ids: torch.Tensor | slice | None = None) -> torch.Tensor:
+        """Pooled per-step mean of an accumulating metric over ``env_ids``."""
+        idx = slice(None) if env_ids is None else env_ids
+        # `clamp` rather than a branch on the count: an empty selection yields 0/1 = 0
+        count = self._metric_counts[name][idx].sum()
+        return self.metrics[name][idx].sum() / count.clamp(min=1.0)
 
     def create_gui(
         self,
@@ -97,36 +114,66 @@ class DirectionCommand(CommandTerm):
         idx = slice(None) if env_ids is None else env_ids
         self._turn_steps[idx] = 0.0
         self._episode_steps[idx] = 0.0
-        return super().reset(env_ids)
+
+        # Taken before `super().reset` zeroes the accumulators, and overriding what it reports:
+        # its mean-of-sums is meaningless now that the metrics hold sums rather than averages.
+        # Stacked so the whole flush costs one host sync instead of one per metric.
+        names = list(self.metrics)
+        pooled = torch.stack([self.metric_mean(name, env_ids) for name in names])
+
+        extras = super().reset(env_ids)
+        extras.update(zip(names, pooled.tolist()))
+        for count in self._metric_counts.values():
+            count[idx] = 0.0
+        return extras
+
+    def _accumulate(self, name: str, value: torch.Tensor, mask: torch.Tensor | None = None) -> None:
+        """Fold one step into a metric's per-env sum and step count.
+
+        ``mask`` restricts a term to the commands it is meaningful under; masked-out steps advance
+        neither, so they neither bias the sum nor inflate the divisor.
+        """
+        if mask is None:
+            self.metrics[name] += value
+            self._metric_counts[name] += 1.0
+        else:
+            self.metrics[name] += torch.where(mask, value, torch.zeros_like(value))
+            self._metric_counts[name] += mask.float()
 
     def _update_metrics(self) -> None:
-        max_command_time = self.cfg.resampling_time_range[1]
-        max_command_step = max_command_time / self._env.step_dt
+        cmd = self.command
+        cmd_dir = cmd[:, :2]
+        cmd_turn = cmd[:, 2]
+        has_dir = torch.norm(cmd_dir, dim=-1) > _CMD_DEADBAND
+        is_turn_cmd = cmd_turn.abs() > _CMD_DEADBAND
 
         vel_xy_b = self.robot.data.root_link_lin_vel_b[:, :2]
         vel_norm = torch.norm(vel_xy_b, dim=-1, keepdim=True)
         vel_dir_b = torch.where(vel_norm > 1e-5, vel_xy_b / vel_norm, torch.zeros_like(vel_xy_b))
+        yaw_rate = self.robot.data.root_link_ang_vel_b[:, 2]
 
-        cmd = self.command
-        cmd_dir = cmd[:, :2]
-
-        # Direction alignment error (angle between commanded and actual direction).
+        # Direction alignment error (angle between commanded and actual direction). Restricted to
+        # envs that have a heading to follow: a stand or pivot command has `cmd_dir == 0`, and the
+        # resulting `acos(0) = pi/2` is an artefact of the zero vector, not a tracking failure.
         dot_prod = torch.sum(cmd_dir * vel_dir_b, dim=-1).clamp(-1.0, 1.0)
-        dir_error = torch.acos(dot_prod)
-        self.metrics["cmd_angle_error"] += dir_error / max_command_step
+        self._accumulate("cmd_angle_error", torch.acos(dot_prod), has_dir)
 
-        # Turning alignment error: commanded turn dir vs. sign of actual yaw rate.
-        actual_turn_dir = torch.sign(self.robot.data.root_link_ang_vel_b[:, 2])
-        turn_error = torch.abs(cmd[:, 2] - actual_turn_dir)
-        self.metrics["turn_sign_error"] += turn_error / max_command_step
+        # Turning alignment error in [0, 2]: 0 correct, 1 not turning, 2 turning the wrong way.
+        # Valid under a zero-turn command too, which is what `_TURN_DEADBAND` buys -- see there.
+        actual_turn_dir = torch.sign(yaw_rate) * (yaw_rate.abs() > _TURN_DEADBAND)
+        self._accumulate("turn_sign_error", torch.abs(cmd_turn - actual_turn_dir))
+
+        # Yaw rate projected onto the commanded turn: the quantity `ang_vel_rew_13` shapes, whose
+        # reward saturates at 0.6 rad/s. Sign agreement alone cannot show a robot turning at half
+        # that rate, so this is the one to read when judging turn tracking.
+        self._accumulate("w_pr", cmd_turn * yaw_rate, is_turn_cmd)
 
         # Velocity projection (v_pr) onto the commanded direction.
-        v_pr = torch.sum(self.robot.data.root_link_lin_vel_b[:, :2] * cmd_dir, dim=-1)
-        self.metrics["v_pr"] += v_pr / max_command_step
+        self._accumulate("v_pr", torch.sum(vel_xy_b * cmd_dir, dim=-1), has_dir)
 
         # Direct read of the pivot share of the batch, so a change to the sampling weights is
         # visible without waiting for an episode to end and flush the accumulated metrics.
-        is_pivot = (torch.norm(cmd_dir, dim=1) < 0.1) & (cmd[:, 2].abs() > 0.1)
+        is_pivot = ~has_dir & is_turn_cmd
         self._env.extras["log"]["Metrics/pivot_command_fraction"] = is_pivot.float().mean()
 
     def _resample_command(self, env_ids: torch.Tensor) -> None:
