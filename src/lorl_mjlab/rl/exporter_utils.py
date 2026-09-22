@@ -1,4 +1,5 @@
 import os
+from collections.abc import Callable
 from pathlib import Path
 from typing import Any
 
@@ -36,22 +37,17 @@ def _deploy_gains(
     return kp[ctrl_ids_natural].tolist(), kd[ctrl_ids_natural].tolist()
 
 
-def get_base_metadata(
+def get_common_metadata(
     env: ManagerBasedRlEnv, run_path: str, obs_group_name: str = "policy"
 ) -> dict[str, list | str | float]:
-    """Get base metadata common to all RL policy exports.
+    """Metadata every deployment needs, whatever the action space.
 
-    Args:
-        env: The RL environment.
-        run_path: W&B run path or other identifier.
-        obs_group_name: observation group like actor, policy or privileged
-
-    Returns:
-        Dictionary of metadata fields that are common across all tasks.
+    Joint names, deployment PD gains, the default pose and the observation layout: everything a
+    controller must know to build the policy's input vector and drive the joints. What it does
+    *not* include is how the policy's output becomes joint targets -- that is action-space
+    specific, and each exporter adds it on top.
     """
     robot: Entity = env.scene["robot"]
-    joint_action = env.action_manager.get_term("joint_pos")
-    assert isinstance(joint_action, JointPositionAction)
     joint_name_to_ctrl_id = {}
     for actuator in robot.spec.actuators:
         joint_name = actuator.target.split("/")[-1]
@@ -96,10 +92,20 @@ def get_base_metadata(
         "observation_terms_flatten_history_dim": observation_term_flatten_history_dim,
         "observation_terms_history_length": observation_term_history_length,
         "observation_terms_clip": observation_term_clip,
-        "action_scale": joint_action._scale[0].cpu().tolist()
-        if isinstance(joint_action._scale, torch.Tensor)
-        else joint_action._scale,
     }
+
+
+def get_base_metadata(
+    env: ManagerBasedRlEnv, run_path: str, obs_group_name: str = "policy"
+) -> dict[str, list | str | float]:
+    """Metadata for a joint-position policy: the common fields plus the action scale."""
+    joint_action = env.action_manager.get_term("joint_pos")
+    assert isinstance(joint_action, JointPositionAction)
+    metadata = get_common_metadata(env, run_path, obs_group_name)
+    metadata["action_scale"] = (
+        joint_action._scale[0].cpu().tolist() if isinstance(joint_action._scale, torch.Tensor) else joint_action._scale
+    )
+    return metadata
 
 
 def _attach_metadata_to_onnx(program: torch.onnx.ONNXProgram, metadata: dict[str, list | str | float]) -> None:
@@ -111,8 +117,14 @@ def _attach_metadata_to_onnx(program: torch.onnx.ONNXProgram, metadata: dict[str
         program.model.metadata_props[k] = list_to_csv_str(v) if isinstance(v, list) else str(v)
 
 
-def export_policy_to_onnx_and_attach_metadata(
-    alg: PPO | Distillation, env: ManagerBasedRlEnv, path: str, logger: Logger, upload_model: bool, obs_group_name: str
+def export_policy_to_onnx_with_metadata(
+    alg: PPO | Distillation,
+    env: ManagerBasedRlEnv,
+    path: str,
+    logger: Logger,
+    upload_model: bool,
+    obs_group_name: str,
+    metadata_fn: Callable[[ManagerBasedRlEnv, str, str], dict[str, list | str | float]] = get_base_metadata,
 ) -> None:
     onnx_path = Path(path).with_suffix(".onnx")
     export_dir = onnx_path.parent
@@ -131,7 +143,7 @@ def export_policy_to_onnx_and_attach_metadata(
     assert onnx_program is not None, "Something went wrong during model export"
 
     run_name = (wandb.run.name if logger.logger_type == "wandb" and wandb.run else "local") or "local"
-    metadata = get_base_metadata(env, run_name, obs_group_name)
+    metadata = metadata_fn(env, run_name, obs_group_name)
     _attach_metadata_to_onnx(onnx_program, metadata)
     onnx_program.save(str(onnx_path), external_data=False)
 

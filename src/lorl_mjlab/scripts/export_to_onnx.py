@@ -10,7 +10,7 @@ from mjlab.rl import RslRlVecEnvWrapper
 from mjlab.rl.runner import MjlabOnPolicyRunner
 from mjlab.tasks.registry import load_env_cfg, load_rl_cfg, load_runner_cls
 
-from lorl_mjlab.rl.exporter_utils import export_policy_to_onnx_and_attach_metadata
+from lorl_mjlab.rl.exporter_utils import export_policy_to_onnx_with_metadata
 
 
 @dataclass
@@ -31,7 +31,7 @@ def main():
     runner.load(args.checkpoint_path, map_location=args.device)
 
     os.makedirs(Path(args.save_path).parent, exist_ok=True)
-    export_policy_to_onnx_and_attach_metadata(
+    export_policy_to_onnx_with_metadata(
         runner.alg,
         env,
         args.save_path,
