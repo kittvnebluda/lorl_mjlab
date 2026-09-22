@@ -11,12 +11,20 @@ support that mjlab's own `rl` module doesn't expose yet.
 
 ## Install
 
+Clone this repo
+
+```bash
+git clone https://github.com/kittvnebluda/lorl_mjlab.git
+```
+
+Sync packages
+
 ```bash
 make sync       # GPU (CUDA 13.0 wheels)
 make sync-cpu   # CPU only
 ```
 
-## Tasks
+## Available tasks
 
 ```bash
 uv run list-envs
@@ -26,7 +34,7 @@ uv run list-envs
 
 ```bash
 uv run train Lorl-Direction-Rough-Unitree-Go1
-uv run play Lorl-Direction-Rough-Unitree-Go1 --checkpoint <path>
+uv run play Lorl-Direction-Rough-Unitree-Go1 --checkpoint-file <path>
 
 # Distillation needs a trained teacher checkpoint:
 uv run train Lorl-Direction-Rough-Unitree-Go1-Distill \
@@ -49,7 +57,7 @@ Open the printed URL, expand **Commands → Teleop**, and tick `Enable`. Until t
 command terms resample exactly as they always have.
 
 | Widget | Hotkey | Action |
-|---|---|---|
+| --- | --- | --- |
 | `Enable` | — | Master gate |
 | `Move` | `I` / `,` | Head forward (0°) / reverse (180°) |
 | `Heading (deg)` | `J` / `L` | Steer left / right, 15° per press |

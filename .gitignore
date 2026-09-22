@@ -12,5 +12,5 @@ typings
 
 # Logging
 wandb/
-logs/
+logs*/
 out/
