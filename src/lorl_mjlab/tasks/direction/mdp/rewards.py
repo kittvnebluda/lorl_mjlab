@@ -200,11 +200,6 @@ class stand_posture:
 
     Implemented as a class so the target pose is captured once at construction rather than
     re-read on every step.
-
-    Currently parked: defined but not wired into any task's reward set. PMTG's trajectory
-    generator will define the nominal stance itself. A 1500-iteration A/B found no effect on
-    task metrics beyond the run-to-run noise floor -- the only measurable difference was the
-    stance itself (thigh 0.83 -> 0.65, calf -1.21 -> -1.06 with the term removed).
     """
 
     def __init__(self, cfg: RewardTermCfg, env: ManagerBasedRlEnv):
